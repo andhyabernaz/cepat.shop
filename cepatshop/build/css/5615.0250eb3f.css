@@ -1,0 +1,1 @@
+.slide-right-enter-active{animation:slide-left .5s ease-in-out}.slide-right-leave-active{animation:slide-right .5s ease-in-out}@keyframes slide-right{0%{transform:translateX(0)}to{transform:translateX(500px)}}@keyframes slide-left{0%{transform:translateX(500px)}to{transform:translateX(0)}}

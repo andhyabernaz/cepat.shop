@@ -1,0 +1,12 @@
+{
+   "private": true,
+   "type": "module",
+   "scripts": {
+      "dev": "npm run serve",
+      "prod": "npm run build",
+      "serve": "cd cepatshop && quasar dev",
+      "build": "cd cepatshop && quasar build -m pwa",
+      "build-spa": "cd cepatshop && quasar build",
+      "start": "cd cepatshop && npm install"
+   }
+}
