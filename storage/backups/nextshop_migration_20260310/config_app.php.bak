@@ -16,7 +16,7 @@ return [
     |
     */
 
-   'name' => env('APP_NAME', 'Cepatshop'),
+   'name' => env('APP_NAME', 'Nextshop'),
    'secret_key' => env('SECRET_KEY', 'c98b2511b5a3c6ee692cc848cf'),
 
    /*

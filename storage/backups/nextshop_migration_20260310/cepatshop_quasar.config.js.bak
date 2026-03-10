@@ -225,8 +225,8 @@ module.exports = configure(function (ctx) {
             msapplicationTileColor: '#000000'
          },
          manifest: {
-            name: `Cepatshop App`,
-            short_name: `Cepatshop App`,
+            name: `Nextshop App`,
+            short_name: `Nextshop App`,
             description: `The next generation online shop apps`,
             display: 'standalone',
             orientation: 'portrait',
