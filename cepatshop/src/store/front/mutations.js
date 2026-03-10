@@ -20,7 +20,7 @@ export function SET_INITIAL_DATA(state, payload) {
 
    state.promote_posts.count = payload.post_promote_count
 
-   if (payload.categories.length != state.categories.length) {
+   if (payload.categories.length != (state.categories.data ? state.categories.data.length : 0)) {
       state.categories.data = payload.categories
       state.categories.ready = true
       state.categories.available = state.categories.data.length > 0
@@ -50,7 +50,7 @@ export function SET_POST_TAGS(state, payload) {
 }
 export function SET_CATEGORIES(state, payload) {
 
-   if (payload.length != state.categories.length) {
+   if (payload.length != (state.categories.data ? state.categories.data.length : 0)) {
       state.categories.data = payload
       state.categories.ready = true
       state.categories.available = state.categories.data.length > 0

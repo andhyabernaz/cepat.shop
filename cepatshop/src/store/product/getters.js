@@ -1,6 +1,6 @@
 export const getProductById = (state) => (id) => {
   let p = state.products.data.find(el => el.id == id)
-  if(p != undefined) {
+  if (p != undefined) {
     return p
   } else {
     return null
@@ -8,8 +8,8 @@ export const getProductById = (state) => (id) => {
 }
 
 export const favoriteCount = (state) => {
-  return state.favorites.length
+  return state.favorites ? state.favorites.length : 0
 }
 export const productCount = (state) => {
-  return state.products.data.length
+  return (state.products && state.products.data) ? state.products.data.length : 0
 }

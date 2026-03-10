@@ -63,12 +63,12 @@ export function SET_SEARCH_KEY(state, payload) {
 export function ADD_REMOVE_TO_FAVORITE(state, fid) {
    state.productFavorites.data = state.productFavorites.data.filter(el => el.id != fid)
 
-   if (state.productFavorites.data.length == 0) {
+   if (state.productFavorites.data && state.productFavorites.data.length == 0) {
       state.productFavorites.available = false
       state.productFavorites.ready = true
    }
 
-   if (state.favorites.length > 0) {
+   if (state.favorites && state.favorites.length > 0) {
       let n = state.favorites.find(e => e == fid)
       if (n != undefined) {
          state.favorites = state.favorites.filter(h => h != fid)
@@ -112,7 +112,7 @@ export function SET_PRODUCT_FAVORITE(state, payload) {
    if (!state.productFavorites.data.length) {
       state.favorites = []
    }
-   if (state.productFavorites.data.lenght < state.favorites.length) {
+   if ((state.productFavorites.data ? state.productFavorites.data.length : 0) < (state.favorites ? state.favorites.length : 0)) {
       state.favorites = []
       state.productFavorites.data.forEach(el => {
          state.favorites.push(el.id)

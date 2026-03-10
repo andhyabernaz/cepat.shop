@@ -5,7 +5,7 @@
 
             <!-- <SwiperSlider></SwiperSlider> -->
 
-            <div v-if="sliders.data.length">
+            <div v-if="sliders && sliders.data && sliders.data.length">
 
                <SplideSlider :sliders="sliders.data" />
             </div>
@@ -15,7 +15,7 @@
                <q-img :ratio="16 / 9" v-for="item in banners" :key="item.id" :src="item.image_url" :alt="item.title" />
             </BannerContainer>
 
-            <div id="product-promo" v-if="product_promo.length">
+            <div id="product-promo" v-if="product_promo && product_promo.length">
                <ProductPromo :product_promo="product_promo" />
             </div>
 

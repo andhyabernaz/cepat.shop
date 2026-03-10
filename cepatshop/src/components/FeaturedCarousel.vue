@@ -1,5 +1,5 @@
 <template>
-   <div v-if="blocks.featured.length" class="overflow-hidden auto-padding block-container q-pt-md">
+   <div v-if="blocks && blocks.featured && blocks.featured.length" class="overflow-hidden auto-padding block-container q-pt-md">
       <div class="featured-carousel overflow-hidden auto-padding">
          <CarouselSection :maxPerView="maxView">
             <div v-for="feature in blocks.featured" :key="feature.id">

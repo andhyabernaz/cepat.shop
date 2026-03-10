@@ -31,6 +31,11 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 |
 */
 
+// XAMPP Subdirectory Hotfix
+if (strpos($_SERVER['REQUEST_URI'], '/cepat.shop/') === 0) {
+    $_SERVER['REQUEST_URI'] = substr($_SERVER['REQUEST_URI'], 11);
+}
+
 require __DIR__.'/../vendor/autoload.php';
 
 /*

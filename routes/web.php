@@ -32,6 +32,6 @@ Route::middleware([Installed::class])->group(
       Route::get('/sitemap.xml', [FrontController::class, 'sitemap']);
       Route::get('/clear-cache', [FrontController::class, 'clearCache']);
       Route::get('/force-update', [UpdateController::class, 'forceUpdate']);
-      Route::get('/{any}', [FrontController::class, 'any'])->where('any', '^(?!api).*$');
+      Route::get('/{any}', [FrontController::class, 'any'])->where('any', '^(?!api|api-public).*$');
    }
 );

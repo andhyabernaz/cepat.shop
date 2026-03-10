@@ -18,14 +18,14 @@ export default {
    },
    SET_AFFILIATE_CONFIG: (state, payload) => {
       state.affiliate_config = payload
-      if(payload.is_active == true) {
-         for(let i =0; i < state.customer_menus.length; i++) {
-            if(state.customer_menus[i].group == 'affiliate') {
+      if (payload.is_active == true) {
+         for (let i = 0; i < (state.customer_menus ? state.customer_menus.length : 0); i++) {
+            if (state.customer_menus[i].group == 'affiliate') {
                state.customer_menus[i].active = true
             }
          }
       }
-    },
+   },
    CAN_INSTALL: (state, data) => {
       state.can_install = data
    },

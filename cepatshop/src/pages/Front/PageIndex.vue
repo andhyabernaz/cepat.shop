@@ -2,12 +2,12 @@
    <q-page class="mainpage">
       <div class="main-content">
          <template v-if="!loading">
-            <div v-if="sliders.data.length">
+            <div v-if="sliders && sliders.data && sliders.data.length">
                <SplideSlider :sliders="sliders.data" />
             </div>
             <BannerContainer :data="banners" class="banner-bottom" />
             <CategoryCarousel />
-            <div id="product-promo" v-if="product_promo.length">
+            <div id="product-promo" v-if="product_promo && product_promo.length">
                <ProductPromo :product_promo="product_promo" />
             </div>
             <InstallApp spacing />

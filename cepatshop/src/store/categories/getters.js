@@ -3,13 +3,13 @@ export const getById = (state) => (id) => {
 }
 
 export const categoryCount = (state) => {
-  return state.categories.data.length
+  return (state.categories.data ? state.categories.data.length : 0)
 }
 export const getValueOptions = (state) => {
   let data = []
-  if(state.categories.data.length > 0) {
+  if (state.categories.data && state.categories.data.length > 0) {
     state.categories.data.forEach(el => {
-      data.push({label: el.title, value: el.id})
+      data.push({ label: el.title, value: el.id })
     });
   }
   return data;
@@ -17,15 +17,15 @@ export const getValueOptions = (state) => {
 
 export const getParentCategories = (state) => {
   let data = []
-  if(state.categories.data.length > 0) {
+  if (state.categories.data && state.categories.data.length > 0) {
     data = state.categories.data.filter(el => !el.category_id);
   }
   return data;
 }
 export const getParentCategoryOptions = (state) => {
   let data = []
-  if(state.categories.data.length > 0) {
+  if (state.categories.data && state.categories.data.length > 0) {
     data = state.categories.data.filter(el => !el.category_id).map(cat => ({ label: cat.title, value: cat.id }));
   }
-  return [{ label: 'None', value: ''}, ...data];
+  return [{ label: 'None', value: '' }, ...data];
 }

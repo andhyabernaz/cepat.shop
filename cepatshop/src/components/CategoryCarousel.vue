@@ -1,6 +1,6 @@
 <template>
    <div>
-      <div id="categories" v-if="categories.ready && categories.data.length" class="block-container">
+      <div id="categories" v-if="categories && categories.ready && categories.data && categories.data.length" class="block-container">
          <div class="auto-padding">
             <div class="block-title featured q-mb-md">
                <h2>Kategori</h2>

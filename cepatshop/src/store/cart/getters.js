@@ -1,5 +1,5 @@
 export const cartCount = (state) => {
-   return state.carts.length
+   return state.carts ? state.carts.length : 0
 }
 
 export const getCarts = (state) => {
@@ -35,7 +35,7 @@ export const getChartOrderForm = (state, getters, rootState) => {
    let grandTotal = parseInt(total) - (parseInt(voucher_discount) + parseInt(shipping_discount));
    let billing_total = parseInt(grandTotal) + parseInt(payment_fee)
 
-   let productType = state.carts.length ? state.carts[0].product_type : null
+   let productType = (state.carts && state.carts.length) ? state.carts[0].product_type : null
 
    return {
       subtotal: subtotal,
@@ -100,7 +100,7 @@ function getShippingDiscount(state, shipping_cost) {
 
 function sumSubtotal(items) {
    let subtotal = 0
-   if (items.length) {
+   if (items && items.length) {
 
       if (items.length > 1) {
          let j = [];
@@ -117,7 +117,7 @@ function sumSubtotal(items) {
 }
 function sumWeight(items) {
    let weight = 0
-   if (items.length) {
+   if (items && items.length) {
 
       if (items.length > 1) {
          let w = [];
@@ -135,7 +135,7 @@ function sumWeight(items) {
 }
 function sumQty(items) {
    let qty = 0
-   if (items.length) {
+   if (items && items.length) {
 
       if (items.length > 1) {
          let q = [];

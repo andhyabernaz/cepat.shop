@@ -14,11 +14,11 @@ export function SET_PERMISSIONS(state, payload) {
 export function SET_TOKEN(state, token) {
    state.token = token
 }
-export function SET_CUSTOMER_LICENSE (state, payload) {
-  state.customer_licenses ={...payload}
+export function SET_CUSTOMER_LICENSE(state, payload) {
+   state.customer_licenses = { ...payload }
 }
-export function SET_WITHDRAWAL (state, payload) {
-  state.customer_withdrawal ={...payload}
+export function SET_WITHDRAWAL(state, payload) {
+   state.customer_withdrawal = { ...payload }
 }
 export function SET_USER_ADDRESS(state, payload) {
    state.address = payload
@@ -31,7 +31,7 @@ export function DELETE_ADDRESS(state, id) {
 }
 export function PUSH_ADDRESS(state, payload) {
    if (payload.is_primary) {
-      for (let i = 0; i < state.address.length; i++) {
+      for (let i = 0; i < (state.address ? state.address.length : 0); i++) {
          state.address[i].is_primary = false
       }
    }

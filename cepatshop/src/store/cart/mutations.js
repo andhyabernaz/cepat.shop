@@ -2,7 +2,7 @@
 
 export function ADD_TO_CART(state, payload) {
 
-   if (state.carts.length) {
+   if (state.carts && state.carts.length) {
 
       let hasItem = state.carts.find(el => el.sku == payload.sku)
 
@@ -40,8 +40,8 @@ export function INCREMENT_QTY(state, sku) {
 export function DECREMENT_QTY(state, sku) {
 
    let objIndex = state.carts.findIndex(el => el.sku == sku)
-  let curQty = state.carts[objIndex].quantity
-   state.carts[objIndex].quantity = parseInt(curQty) -1
+   let curQty = state.carts[objIndex].quantity
+   state.carts[objIndex].quantity = parseInt(curQty) - 1
 
 }
 
