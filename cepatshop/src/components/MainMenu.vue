@@ -1,35 +1,37 @@
 <template>
-   <q-scroll-area class="fit sidebar " :class="{ 'bg-dark text-white': is_dark, 'text-grey-9': !is_dark }">
+   <q-scroll-area class="fit sidebar cs-sidebar" :class="{ 'cs-sidebar--dark': is_dark, 'cs-sidebar--light': !is_dark }">
       <q-list :dark="is_dark" class="q-pb-lg">
          <div :class="is_mini ? 'q-py-xs' : 'q-py-lg'" >
 
             <q-item>
                <q-item-section avatar>
-                  <q-avatar color="primary" text-color="white" size="48px">{{ initialName }}</q-avatar>
+                  <div class="cs-avatar-ring">
+                     <q-avatar color="primary" text-color="white" size="48px">{{ initialName }}</q-avatar>
+                  </div>
                </q-item-section>
                <q-item-section>
-                  <q-item-label class="text-sm text-weight-bold">Welcome,</q-item-label>
+                  <q-item-label class="text-sm" style="opacity: 0.7">Welcome,</q-item-label>
                   <q-item-label class="text-h5 text-weight-bold">{{ user.name }}</q-item-label>
-                  <q-item-label class="text-xs">Active from {{ $dateParse(user.created_at)
+                  <q-item-label class="text-xs" style="opacity: 0.6">Active from {{ $dateParse(user.created_at)
                   }}</q-item-label>
                   <q-item-label>{{ moneyIdr(user.saldo_balance) }}</q-item-label>
-                  <!-- <q-item-label class="text-grey-3">{{ user.phone }}</q-item-label> -->
                </q-item-section>
             </q-item>
          </div>
          <q-separator :color="is_dark ? 'grey-8' : 'grey-2'"></q-separator>
          <q-item-label header>
             <div class="flex justify-between items-center">
-               <div>Navigation</div>
+               <div style="font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; font-size: 11px; opacity: 0.5">Navigation</div>
                <q-toggle v-model="is_dark"  checked-icon="light_mode" color="green" unchecked-icon="dark_mode"></q-toggle>
             </div>
          </q-item-label>
          <template v-for="(item, i) in menus" :key="i" >
-         <q-item clickable v-ripple :to="{ name: item.path }" v-if="item.active && $can(item.ability)" :class="{
-            'text-white': is_dark && $route.name == item.path,
-            'text-grey-6': is_dark && $route.name != item.path,
-            'text-primary': !is_dark && $route.name == item.path,
-            'text-grey-8': !is_dark && $route.name != item.path,
+         <q-item clickable v-ripple :to="{ name: item.path }" v-if="item.active && $can(item.ability)"
+            class="cs-menu-item"
+            :class="{
+            'cs-menu-item--active': $route.name == item.path,
+            'cs-menu-item--dark': is_dark,
+            'cs-menu-item--light': !is_dark,
          }">
             <q-item-section avatar>
                <q-avatar :icon="item.icon" :text-color="getIconTextColor(item.path)" rounded font-size="23px"
@@ -37,7 +39,7 @@
             </q-item-section>
             <q-item-section>
                <q-item-label class="text-weight-medium">{{ item.label }}</q-item-label>
-               <q-item-label caption>{{ item.caption }}</q-item-label>
+               <q-item-label caption style="opacity: 0.6">{{ item.caption }}</q-item-label>
             </q-item-section>
             <q-tooltip v-if="is_mini" class="bg-purple text-13" anchor="center right" self="center start">
                {{ item.label }}

@@ -59,16 +59,16 @@ module.exports = configure(function (ctx) {
          env: {
             API: ctx.dev
                ? 'http://localhost:8000/api'
-               : '/api',
+               : '/cepat.shop/api',
             PUBLIC_API: ctx.dev
                ? 'http://localhost:8000/api-public/'
-               : '/api-public/',
+               : '/cepat.shop/api-public/',
          },
 
          htmlFilename: ctx.dev ? 'index.html' : 'index.php',
 
          // transpile: false,
-         // publicPath: '/',
+         publicPath: ctx.dev ? '/' : '/cepat.shop/',
 
          // Add dependencies for transpiling with Babel (Array of string/regex)
          // (from node_modules, which are by default not transpiled).
@@ -90,6 +90,10 @@ module.exports = configure(function (ctx) {
          chainWebpack(chain) {
             chain.plugin('eslint-webpack-plugin')
                .use(ESLintPlugin, [{ extensions: ['js', 'vue'] }])
+
+            if (!ctx.dev) {
+               chain.output.publicPath('/cepat.shop/')
+            }
          },
 
          distDir: 'build',

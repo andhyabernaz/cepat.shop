@@ -1,7 +1,7 @@
 <template>
-   <q-layout view="lHh LpR fFf" class="bg-grey-2 q-pb-lg">
-      <q-header bordered class="shadow bg-white text-dark">
-         <q-toolbar>
+   <q-layout view="lHh LpR fFf" class="cs-admin-content q-pb-lg">
+      <q-header bordered class="cs-admin-header">
+         <q-toolbar class="cs-toolbar">
             <q-btn dense flat round icon="menu" @click="toggleLeftDrawer"
                class="bg-grey-2 q-pa-xs q-mr-sm" />
             <img style="height:26px" :src="shop.logo" />
@@ -30,7 +30,7 @@
             <q-btn icon="store" :to="{ name: 'Home', query: { is_update: true } }" round dense flat></q-btn>
          </q-toolbar>
       </q-header>
-      <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered :mini="is_mini" :mini-width="62">
+      <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered class="cs-admin-drawer" :mini="is_mini" :mini-width="62">
          <MainMenu></MainMenu>
       </q-drawer>
       <q-page-container>

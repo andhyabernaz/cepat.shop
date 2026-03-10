@@ -1,6 +1,6 @@
 <template>
-   <q-layout view="hHh lpR fFf" class="auth__layout bg-grey-2">
-       <q-header class="text-dark bg-grey-2" >
+   <q-layout view="hHh lpR fFf" class="cs-auth-layout auth__layout">
+       <q-header class="text-dark" style="background: transparent;">
        <q-toolbar>
          <q-btn :to="{name: 'Home'}"
             unelevated round dense
@@ -8,7 +8,7 @@
        </q-toolbar>
     </q-header>
       <q-page-container>
-           <div class="main-content full-width">
+           <div class="main-content full-width q-pa-md">
               <router-view />
            </div>
       </q-page-container>

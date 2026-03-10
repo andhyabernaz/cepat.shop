@@ -3,19 +3,26 @@
       :class="[{ 'mobile-view': !is_mode_desktop, 'desktop-view': is_mode_desktop }, isActiveTheme]">
       <notify v-if="config && config.is_notifypro" />
       <q-header :reveal="isReveal"
-         :class="{ 'bg-white text-grey-8 box-shadow q-pt-sm': isActiveTheme != 'elegant', 'bg-brand text-white': isActiveTheme == 'elegant' }">
-         <q-toolbar>
-            <div class="flex q-gutter-x-sm cursor-pointer items-center" @click="$router.push('/')"
+         class="cs-header"
+         :class="{
+            'cs-header--default': isActiveTheme != 'elegant',
+            'cs-header--elegant': isActiveTheme == 'elegant'
+         }">
+         <q-toolbar class="cs-toolbar">
+            <div class="flex q-gutter-x-sm cursor-pointer items-center cs-brand-link" @click="$router.push('/')"
                :class="{ 'col-auto': is_mode_desktop, 'col': !is_mode_desktop }">
-               <img v-if="shop" class="logo" :src="shop.logo ? shop.logo : '/icon/icon-192x192.png'" alt="Logo" />
-               <div v-if="shop && shop.name && config.display_sitename" class="text-weight-bold text-no-wrap text-lg">
+               <img v-if="shop" class="logo cs-logo" :src="shop.logo ? shop.logo : '/icon/icon-192x192.png'" alt="Logo" />
+               <div v-if="shop && shop.name && config.display_sitename" class="cs-brand-name text-weight-bold text-no-wrap">
                   {{ shop.name }}</div>
             </div>
             <div class="col q-mx-lg q-pa-sm" v-if="is_mode_desktop">
-               <q-input ref="input" borderless dense class="text-sm q-px-lg bg-grey-1 rounded20" v-model="search"
+               <q-input ref="input" borderless dense class="cs-search-input" v-model="search"
                   @keyup.enter="searchNow" placeholder="Cari produk...">
+                  <template v-slot:prepend>
+                     <q-icon name="search" color="grey-5" />
+                  </template>
                   <template v-slot:append>
-                     <q-icon name="search" class="cursor-pointer" @click="searchNow" />
+                     <q-btn v-if="search" flat round dense icon="close" size="sm" @click="search = ''" />
                   </template>
                </q-input>
             </div>
@@ -23,12 +30,12 @@
                <MenuRight no-search />
             </div>
          </q-toolbar>
-         <q-tabs v-if="is_mode_desktop" inline-label indicator-color="primary">
+         <q-tabs v-if="is_mode_desktop" inline-label indicator-color="primary" class="cs-nav-tabs">
             <q-route-tab label="Beranda" icon="home" to="/" exact />
             <q-route-tab icon="favorite" label="Favorite" :to="{ name: 'ProductFavorite' }" exact />
             <q-route-tab icon="source" label="Katalog" :to="{ name: 'ProductIndex' }" exact />
             <q-route-tab icon="shopping_cart" label="Keranjang" :to="{ name: 'Cart' }" exact>
-               <q-badge v-if="cartCount > 0" color="green" floating>{{
+               <q-badge v-if="cartCount > 0" color="positive" floating rounded>{{
                   cartCount
                   }}</q-badge>
             </q-route-tab>
@@ -39,8 +46,8 @@
          <router-view />
          <FooterBock></FooterBock>
       </q-page-container>
-      <q-footer class="bg-white text-primary footer-tab box-shadow-top" v-if="showFooter">
-         <q-tabs active-color="primary" class="text-grey-8 text-xs" no-caps dense switch-indicator
+      <q-footer class="cs-footer-tab" v-if="showFooter">
+         <q-tabs active-color="primary" class="cs-footer-tabs" no-caps dense switch-indicator
             indicator-color="primary">
             <q-route-tab icon="eva-home-outline" label="Beranda" :to="{ name: 'Home' }" exact />
 
@@ -51,7 +58,7 @@
             <q-route-tab v-if="config && config.theme == 'romance'" icon="eva-shopping-bag"
                :to="{ name: 'ProductIndex' }" class="bg-primary text-white" label="Katalog" exact />
             <q-btn v-if="config && config.theme == 'elegant'" :to="{ name: 'ProductIndex' }" icon="eva-shopping-bag"
-               class="text-md" color="primary" round></q-btn>
+               class="text-md cs-elegant-center-btn" color="primary" round></q-btn>
 
             <q-route-tab icon="eva-book-open-outline" :to="{ name: 'FrontPostIndex' }" label="Artikel" exact />
 

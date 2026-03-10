@@ -1,10 +1,11 @@
 <template>
-   <div class="card-item column full-height relative bg-white box-shadow overflow-hidden">
+   <div class="card-item column full-height relative bg-white overflow-hidden cs-product-card">
       <q-img :src="getImageSrc" :ratio="getImageRatio" :fit="getImageFit"
-         @click="show(product.slug)" class="cursor-pointer">
+         @click="show(product.slug)" class="cursor-pointer cs-product-img">
          <div class="absolute-full text-subtitle2 flex flex-center" v-if="outOfStock">
             <div class="stock-out-badge">Habis</div>
           </div>
+         <div class="cs-product-img-overlay"></div>
       </q-img>
       <div class="relative col column q-gutter-y-xs justify-between q-pb-md q-px-sm q-pt-sm overflow-hidden full-width">
 
@@ -18,7 +19,7 @@
                      product.sold }}</q-item-label>
             </div>
             <div class="full-width q-mt-xs">
-               <q-item-label class="text-subtitle ellipsis-2-lines cursor-pointer" @click="show(product.slug)">{{
+               <q-item-label class="text-subtitle ellipsis-2-lines cursor-pointer cs-product-title" @click="show(product.slug)">{{
                   product.title }}</q-item-label>
             </div>
          </div>

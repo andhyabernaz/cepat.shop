@@ -1,6 +1,6 @@
 <template>
 
-  <div class="footer q-px-sm q-py-lg">
+  <div class="footer q-px-md q-py-xl">
     <div class="main-content grid-2-responsive">
 
       <div class="q-pa-md">

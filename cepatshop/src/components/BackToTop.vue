@@ -1,7 +1,8 @@
 <template>
    <q-page-sticky :offset="[10, 10]" class="back-to-top">
       <Transition name="slide-right">
-         <q-btn v-show="showTotop" icon="eva-chevron-up" class="btt" round color="primary" glossy
+         <q-btn v-show="showTotop" icon="eva-chevron-up" class="btt" round color="primary"
+            style="box-shadow: var(--cs-shadow-lg)"
             @click="jumpTo('q-app')"></q-btn>
       </Transition>
    </q-page-sticky>
@@ -20,7 +21,7 @@ export default {
 
             this.showTotop = true
          } else {
-            this.showTotop = false.v
+            this.showTotop = false
          }
       }
    },
