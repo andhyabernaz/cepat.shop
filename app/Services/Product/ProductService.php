@@ -295,10 +295,12 @@ class ProductService
 
                if ($file['download_type'] == 'file') {
                   if (isset($file['id'])) {
-                     $product->digitalDownloads()->find($file['id'])->update([
-                        'caption' => $file['caption'],
-                        'filename' => $file['filename'],
-                     ]);
+                     $product->digitalDownloads()
+                        ->whereKey($file['id'])
+                        ->update([
+                           'caption' => $file['caption'],
+                           'filename' => $file['filename'],
+                        ]);
                   } else {
                      $temp = UploadTemp::where('filepath', $file['filepath'])
                         ->first();
@@ -321,10 +323,12 @@ class ProductService
                if ($file['download_type'] == 'url') {
 
                   if (isset($file['id'])) {
-                     $product->digitalDownloads()->find($file['id'])->update([
-                        'caption' => $file['caption'],
-                        'filename' => $file['filename'],
-                     ]);
+                     $product->digitalDownloads()
+                        ->whereKey($file['id'])
+                        ->update([
+                           'caption' => $file['caption'],
+                           'filename' => $file['filename'],
+                        ]);
                   } else {
 
                      $product->digitalDownloads()->create([
@@ -368,7 +372,9 @@ class ProductService
 
                   if (isset($data['id'])) {
 
-                     $varian =  ProductVarian::find($data['id']);
+                     $varian = ProductVarian::where('id', $data['id'])
+                        ->where('product_id', $product->id)
+                        ->firstOrFail();
                   } else {
 
                      $varian =  new ProductVarian();
@@ -388,7 +394,9 @@ class ProductService
 
                      if (isset($item['id'])) {
 
-                        ProductVarian::find($item['id'])->update($item);
+                        ProductVarian::where('id', $item['id'])
+                           ->where('product_id', $product->id)
+                           ->update($item);
                      } else {
                         $varian->subvarian()->create($item);
                      }
@@ -400,7 +408,9 @@ class ProductService
 
                   if (isset($data['id'])) {
 
-                     ProductVarian::find($data['id'])->update($data);
+                     ProductVarian::where('id', $data['id'])
+                        ->where('product_id', $product->id)
+                        ->update($data);
                   } else {
                      $product->varians()->create($data);
                   }
@@ -442,7 +452,7 @@ class ProductService
 
    public function destroy($id)
    {
-      $product = Product::find($id);
+      $product = Product::findOrFail($id);
 
       DB::beginTransaction();
 
@@ -451,7 +461,6 @@ class ProductService
          ProductPromo::where('product_id', $product->id)->delete();
          Cart::where('product_id', $product->id)->delete();
          Review::where('product_id', $product->id)->delete();
-         ProductVarian::where('product_id', $product->id)->delete();
          ProductVarian::where('product_id', $product->id)->delete();
          DB::table('product_asset')->where('product_id', $product->id)->delete();
 
@@ -495,7 +504,7 @@ class ProductService
 
    public function removeVarian($id)
    {
-      $varian = ProductVarian::find($id);
+      $varian = ProductVarian::findOrFail($id);
       Product::clearCache($varian->product_id);
       $varian->delete();
       return 1;

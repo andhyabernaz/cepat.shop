@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\NotificationTemplate;
-use Illuminate\Support\Facades\Log;
 use App\Enums\PaymentServiceEnum;
-use App\Models\PaymentConfig;
-use Illuminate\Http\Request;
 use App\Events\OrderFailed;
 use App\Events\OrderPaid;
+use App\Models\NotificationTemplate;
 use App\Models\Order;
+use App\Models\PaymentConfig;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DuitkuWebhookController extends Controller
 {
@@ -22,7 +22,7 @@ class DuitkuWebhookController extends Controller
 
         if ($request->method() != 'POST') {
             echo 'Invalid request method';
-            die;
+            exit;
         }
 
         try {
@@ -57,7 +57,7 @@ class DuitkuWebhookController extends Controller
             $settlementDate = $request->settlementDate ?? null;
             $issuerCode = $request->issuerCode ?? null;
 
-            $params = $merchantCode . $amount . $merchantOrderId . $apiKey;
+            $params = $merchantCode.$amount.$merchantOrderId.$apiKey;
             $calcSignature = md5($params);
 
             if (empty($merchantCode) || empty($amount) || empty($merchantOrderId) || empty($signature)) {
@@ -69,14 +69,13 @@ class DuitkuWebhookController extends Controller
             }
 
             $order = Order::where('order_ref', $merchantOrderId)
-                ->where('order_status', 'PENDING')
-                ->orWhere('order_status', 'UNPAID')
+                ->whereIn('order_status', ['PENDING', 'UNPAID'])
                 ->first();
 
-            if (!$order) {
+            if (! $order) {
                 return response()->json([
                     'success' => true,
-                    'message' => "Invoice current status is not UNPAID"
+                    'message' => 'Invoice current status is not UNPAID',
                 ]);
             }
 
@@ -116,7 +115,7 @@ class DuitkuWebhookController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'success' => true,
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
             ]);
         }
     }

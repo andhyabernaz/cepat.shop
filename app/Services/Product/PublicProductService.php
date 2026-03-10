@@ -94,17 +94,17 @@ class PublicProductService
 
       return new ProductListCollection($data);
    }
-   public function productRelated($id)
+   public function productRelated($id, $per_page = 8)
    {
-      $per_page = $request->per_page ?? 8;
+      $per_page = max(1, (int) $per_page);
 
-      $cacheKey = 'product_related_' . $id;
+      $cacheKey = 'product_related_' . $id . '_' . $per_page;
 
       if (Cache::has($cacheKey)) {
          $data = Cache::get($cacheKey);
       } else {
 
-         $product = Product::find($id);
+         $product = Product::findOrFail($id);
 
          $instance  = Product::query();
 
@@ -117,6 +117,10 @@ class PublicProductService
                $ids = [];
 
                // CHILDS
+               if (!$category) {
+                  return [$cid];
+               }
+
                if ($category->category_id) {
 
                   $ids = Category::where('category_id', $category->category_id)->select('id')

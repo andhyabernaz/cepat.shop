@@ -2,111 +2,121 @@
 
 namespace App\Services\Order;
 
-use App\Models\Order;
-use App\Models\License;
-use App\Models\Product;
-use App\Models\MutasiSaldo;
-use App\Enums\ProductTypeEnum;
 use App\Enums\MutasiSaldoStatusEnum;
-use App\Models\NotificationTemplate;
+use App\Enums\ProductTypeEnum;
 use App\Jobs\ProcessAffiliateOrderJob;
+use App\Models\License;
+use App\Models\MutasiSaldo;
+use App\Models\Order;
+use App\Models\Product;
 
 class OrderService
 {
-   public function processOrder($order)
-   {
-      $transaction = $order->transaction;
-      $order_status = Order::TOSHIP;
+    public function processOrder($order)
+    {
+        $transaction = $order->transaction;
+        if (! $transaction) {
+            throw new \Exception("Transaction not found for order #{$order->id}");
+        }
+        $order_status = Order::TOSHIP;
 
-      $is_completion_order = false;
+        $is_completion_order = false;
 
-      if ($order->is_digital_type()) {
+        if ($order->is_digital_type()) {
 
-         $order_status = Order::TO_PROCESS;
-
-         if (in_array($order->product_type, [ProductTypeEnum::DigitalDownload->value, ProductTypeEnum::DigitalVideo->value])) {
-            $is_completion_order = true;
-            foreach ($order->items as $item) {
-
-               $expiredDate = NULL;
-
-               if ($item->license_id) {
-                  $license = License::find($item->license_id);
-                  $license->update([
-                     'expired_at' => $expiredDate
-                  ]);
-               } else {
-                  if ($order->user_id) {
-                     $order_status = Order::COMPLETE;
-                     $license =  License::create([
-                        'user_id' => $order->user_id,
-                        'product_id' => $item->product_id,
-                        'expired_at' => $expiredDate
-                     ]);
-                  } else {
-                     $order_status = Order::TO_PROCESS;
-                  }
-               }
-            }
-         } else {
             $order_status = Order::TO_PROCESS;
-         }
-      } else if ($order->is_deposit_type()) {
 
-         MutasiSaldo::create([
-            'amount' => $order->order_total,
-            'type' => MutasiSaldo::TYPE_IN,
-            'category' => MutasiSaldo::CATEGORY_DEFAULT,
-            'user_id' => $order->user_id,
-            'status' => MutasiSaldoStatusEnum::Success,
-            'description' => $order->item->name . ' #' . $order->order_ref,
-         ]);
+            if (in_array($order->product_type, [ProductTypeEnum::DigitalDownload->value, ProductTypeEnum::DigitalVideo->value])) {
+                $is_completion_order = true;
+                foreach ($order->items as $item) {
 
-         $order_status = Order::COMPLETE;
-      } else {
-         if ($order->shipping_type == Order::SHIPPING_PICKUP) {
-            $order_status = Order::AWAITING_PICKUP;
-         }
-      }
+                    $expiredDate = null;
 
-      if (!$order->is_deposit_type()) {
+                    if ($item->license_id) {
+                        $license = License::find($item->license_id);
+                        if ($license) {
+                            $license->update([
+                                'expired_at' => $expiredDate,
+                            ]);
+                        }
+                    } else {
+                        if ($order->user_id) {
+                            $order_status = Order::COMPLETE;
+                            $license = License::create([
+                                'user_id' => $order->user_id,
+                                'product_id' => $item->product_id,
+                                'expired_at' => $expiredDate,
+                            ]);
+                        } else {
+                            $order_status = Order::TO_PROCESS;
+                        }
+                    }
+                }
+            } else {
+                $order_status = Order::TO_PROCESS;
+            }
+        } elseif ($order->is_deposit_type()) {
 
-         foreach ($order->items as $item) {
-            Product::find($item->product_id)->increment('sold', $item->quantity);
-         }
-      }
-      $order->order_status = $order_status;
-      $order->updated_at = now();
-      $order->save();
-      $transaction->status = 'PAID';
-      $transaction->paid_at = now();
-      $transaction->save();
+            MutasiSaldo::create([
+                'amount' => $order->order_total,
+                'type' => MutasiSaldo::TYPE_IN,
+                'category' => MutasiSaldo::CATEGORY_DEFAULT,
+                'user_id' => $order->user_id,
+                'status' => MutasiSaldoStatusEnum::Success,
+                'description' => $order->item->name.' #'.$order->order_ref,
+            ]);
 
-      if($is_completion_order) {
-         $this->completionOrder($order);
-      }
-   }
+            $order_status = Order::COMPLETE;
+        } else {
+            if ($order->shipping_type == Order::SHIPPING_PICKUP) {
+                $order_status = Order::AWAITING_PICKUP;
+            }
+        }
 
-   public function completionOrder($order)
-   {
+        if (! $order->is_deposit_type()) {
 
-      $order->update([
-         'order_status' => Order::COMPLETE
-      ]);
+            foreach ($order->items as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->increment('sold', $item->quantity);
+                }
+            }
+        }
+        $order->order_status = $order_status;
+        $order->updated_at = now();
+        $order->save();
+        $transaction->status = 'PAID';
+        $transaction->paid_at = now();
+        $transaction->save();
 
-      $order->transaction()->update([
-         'status' => 'PAID'
-      ]);
+        if ($is_completion_order) {
+            $this->completionOrder($order);
+        }
+    }
 
-      if (!$order->is_deposit_type()) {
+    public function completionOrder($order)
+    {
 
-         foreach ($order->items as $item) {
-            Product::find($item->product_id)->increment('sold', $item->quantity);
-         }
-      }
+        $order->update([
+            'order_status' => Order::COMPLETE,
+        ]);
 
-      $order->pushHistory('Pesanan selesai');
+        $order->transaction()->update([
+            'status' => 'PAID',
+        ]);
 
-      ProcessAffiliateOrderJob::dispatch($order);
-   }
+        if (! $order->is_deposit_type()) {
+
+            foreach ($order->items as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->increment('sold', $item->quantity);
+                }
+            }
+        }
+
+        $order->pushHistory('Pesanan selesai');
+
+        ProcessAffiliateOrderJob::dispatch($order);
+    }
 }

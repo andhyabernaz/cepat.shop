@@ -38,7 +38,7 @@ class ReviewController extends Controller
 
       try {
 
-         $review = Review::find($request->id);
+         $review = Review::findOrFail($request->id);
 
          $review->update([
             'is_approved' => 1
@@ -57,7 +57,7 @@ class ReviewController extends Controller
 
       try {
 
-         $review = Review::find($id);
+         $review = Review::findOrFail($id);
          Product::clearCache($review->product_id);
          $review->delete();
 

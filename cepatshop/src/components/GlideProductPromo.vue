@@ -8,7 +8,7 @@
         <div class="bg-dark text-white rounded-borders q-px-xs">{{ minuteEl }}</div>
         <div class="bg-dark text-white rounded-borders q-px-xs">
           <transition>
-            <span>{{ secondEl }}</span>
+            <span v-if="secondEl !== null" :key="secondEl">{{ secondEl }}</span>
           </transition>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default {
       dayEl: 0,
       hourEl: 0,
       minuteEl: 0,
-      secondEl: 0,
+      secondEl: null,
       countDownDate: null,
       interval: null,
     }
@@ -121,7 +121,7 @@ export default {
 
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearInterval(this.interval)
   }
 }

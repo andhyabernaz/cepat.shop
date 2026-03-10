@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: 'Front',
+  name: 'SwipeSlider',
   props: {
     datas: Array
   },

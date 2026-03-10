@@ -113,7 +113,7 @@ class UserController extends Controller
 
    public function destroy($id)
    {
-      $user = User::find($id);
+      $user = User::findOrFail($id);
 
       if (env('FORCE_USER_DELETE') == true) {
          $user->forceDelete();

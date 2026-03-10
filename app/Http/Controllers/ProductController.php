@@ -53,8 +53,8 @@ class ProductController extends Controller
     public function getSubscriptionOptions()
    {
        try {
-         $this->service->getSubscriptionOptions();
-         return ApiResponse::success();
+         $data = $this->service->getSubscriptionOptions();
+         return ApiResponse::success($data);
       } catch (Exception $e) {
 
          return ApiResponse::failed($e);
@@ -130,7 +130,7 @@ class ProductController extends Controller
    {
       try {
          $this->service->destroy($id);
-         return APiResponse::success();
+         return ApiResponse::success();
       } catch (Exception $e) {
 
          return ApiResponse::failed($e);

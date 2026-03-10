@@ -22,7 +22,7 @@ class NotificationTemplateController extends Controller
    }
    public function update(NotifTemplateRequest $request, $id)
    {
-      $cfg = NotificationTemplate::find($id);
+      $cfg = NotificationTemplate::findOrFail($id);
       $cfg->update($request->all());
 
       return ApiResponse::success();
@@ -36,7 +36,7 @@ class NotificationTemplateController extends Controller
    }
    public function destroy($id)
    {
-      NotificationTemplate::find($id)->delete();
+      NotificationTemplate::findOrFail($id)->delete();
       return ApiResponse::success();
    }
    public function getOrderStatusOptions()

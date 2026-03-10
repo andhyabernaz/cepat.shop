@@ -81,11 +81,11 @@ class FrontProductController extends Controller
          return ApiResponse::failed($e);
       }
    }
-   public function productRelated($id)
+   public function productRelated(Request $request, $id)
    {
 
       try {
-         return $this->service->productRelated($id);
+         return $this->service->productRelated($id, $request->per_page ?? 8);
       } catch (Exception $e) {
 
          return ApiResponse::failed($e);

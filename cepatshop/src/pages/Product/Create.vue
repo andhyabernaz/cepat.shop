@@ -258,10 +258,9 @@
 import { mapActions } from 'vuex'
 import VarianModal from './VarianFormModal.vue'
 import ContentEditor from 'components/ContentEditor.vue'
-import CategoryBlock from './CategoryBlock.vue'
 import MediaBlock from './MediaBlock.vue'
 export default {
-   components: { VarianModal, ContentEditor, CategoryBlock, MediaBlock },
+   components: { VarianModal, ContentEditor, MediaBlock },
    name: 'ProductFormCreate',
    data() {
       return {

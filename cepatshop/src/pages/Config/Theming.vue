@@ -35,6 +35,7 @@
 <script>
 import { BaseApi } from "boot/axios";
 export default {
+   name: "ConfigTheming",
    data() {
       return {
          form: {
@@ -64,7 +65,6 @@ export default {
    },
    methods: {
       updateData() {
-         let data = { ...this.config, ...this.form };
          BaseApi.post("config", this.form).then(() => {
             this.$q.notify({
                type: "positive",

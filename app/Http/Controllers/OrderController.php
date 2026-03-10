@@ -51,8 +51,12 @@ class OrderController extends Controller
 
    public function show($id)
    {
-      $data = Order::with(['items', 'transaction'])->find($id);
-      return ApiResponse::success($data);
+      try {
+         $data = Order::with(['items', 'transaction'])->findOrFail($id);
+         return ApiResponse::success($data);
+      } catch (\Throwable $th) {
+         return ApiResponse::failed($th);
+      }
    }
 
    public function destroy($id)
@@ -68,7 +72,7 @@ class OrderController extends Controller
    {
       DB::beginTransaction();
       try {
-         $order = Order::find($id);
+         $order = Order::findOrFail($id);
          OrderPaid::dispatch($order);
          DB::commit();
          if ($order->is_deposit_type()) {
@@ -131,7 +135,7 @@ class OrderController extends Controller
          'status' => 'required',
       ]);
 
-      $order = Order::find($request->order_id);
+      $order = Order::findOrFail($request->order_id);
       $order->order_status = $request->status;
       $order->updated_at = now();
 
@@ -171,7 +175,7 @@ class OrderController extends Controller
       DB::beginTransaction();
       try {
          $event = NotificationTemplate::ORDER_COMPLETED;
-         $order = Order::find($id);
+         $order = Order::findOrFail($id);
          $this->orderService->completionOrder($order);
          $order->dispatchEventMessage($event);
          DB::commit();
@@ -186,7 +190,7 @@ class OrderController extends Controller
    public function shipOrder($id)
    {
 
-      $order = Order::find($id);
+      $order = Order::findOrFail($id);
       $event = NotificationTemplate::ORDER_SHIPPING;
 
       $order->update([

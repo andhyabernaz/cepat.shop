@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: 'navigation',
+  name: 'AppNavigation',
    props: {
     title: {
       type: String,
