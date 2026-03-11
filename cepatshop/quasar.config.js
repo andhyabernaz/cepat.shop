@@ -30,7 +30,7 @@ module.exports = configure(function (ctx) {
       // https://v2.quasar.dev/quasar-cli-webpack/boot-files
       boot: [
 
-         'axios', 'helpers', 'functions', 'components', 'swiper'
+         'axios', 'helpers', 'functions', 'components', 'swiper', 'lazy-img'
       ],
 
       // https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-css
@@ -40,7 +40,7 @@ module.exports = configure(function (ctx) {
 
       // https://github.com/quasarframework/quasar/tree/dev/extras
       extras: [
-         'ionicons-v4',
+         // 'ionicons-v4', // Removed - use eva-icons only to reduce bundle
          // 'mdi-v7',
          // 'fontawesome-v6',
          'eva-icons',
@@ -48,7 +48,7 @@ module.exports = configure(function (ctx) {
          // 'line-awesome',
          // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
-         'roboto-font', // optional, you are not bound to it
+         // 'roboto-font', // Removed - using Inter from Google Fonts instead
          'material-icons', // optional, you are not bound to it
       ],
 
@@ -87,12 +87,52 @@ module.exports = configure(function (ctx) {
          // https://v2.quasar.dev/quasar-cli-webpack/handling-webpack
          // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
 
+         // Enable gzip compression for production builds
+         gzip: !ctx.dev,
+
          chainWebpack(chain) {
             chain.plugin('eslint-webpack-plugin')
                .use(ESLintPlugin, [{ extensions: ['js', 'vue'] }])
 
             if (!ctx.dev) {
                chain.output.publicPath('/cepat.shop/')
+
+               // Optimize chunk splitting for better caching
+               chain.optimization.splitChunks({
+                  chunks: 'all',
+                  maxInitialRequests: 10,
+                  maxAsyncRequests: 10,
+                  minSize: 20000,
+                  maxSize: 244000,
+                  cacheGroups: {
+                     vendor: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name: 'vendor',
+                        chunks: 'all',
+                        priority: 10,
+                     },
+                     quasar: {
+                        test: /[\\/]node_modules[\\/]quasar[\\/]/,
+                        name: 'quasar',
+                        chunks: 'all',
+                        priority: 20,
+                     },
+                     swiper: {
+                        test: /[\\/]node_modules[\\/]swiper[\\/]/,
+                        name: 'swiper',
+                        chunks: 'all',
+                        priority: 20,
+                     },
+                     common: {
+                        minChunks: 2,
+                        priority: -10,
+                        reuseExistingChunk: true,
+                     },
+                  },
+               })
+
+               // Minimize CSS
+               chain.optimization.minimize(true)
             }
          },
 

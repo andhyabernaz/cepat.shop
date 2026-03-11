@@ -4,7 +4,6 @@ namespace App\Enums;
 
 enum ProductTypeEnum: string
 {
-   case Default = 'Default';
    case Digital = 'Digital';
    case Deposit = 'Deposit';
    case DigitalDownload = 'Digital Download';

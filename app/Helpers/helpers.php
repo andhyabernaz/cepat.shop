@@ -114,12 +114,11 @@ function generateUserEmailOrderCreated($order)
    $shop = getShop();
    $appName = $shop->name;
 
-   $courier = $order->shipping_courier_name;
    $total = 'Rp. ' . number_format($order->order_total, 0, ",", ".");
    $tgl = Carbon::parse($order->created_at)->format('d/m/Y  H:i');
    $expiredDate = Carbon::createFromTimestamp($order->transaction->expired_time)->format('d/m/Y H:i');
 
-   $body = "Halo, Yth $order->customer_name \nTerima kasih sudah berbelanja di $appName\nBerikut detil pesanan anda:\nNama : $order->customer_name \nInvoice : $order->order_ref\nDibuat : $tgl\nTotal :  $total\nKurir : $courier\n\nSegera lakukan pembayaran sebelum $expiredDate agar pesanan anda dapat diproses, Terimakasih.";
+   $body = "Halo, Yth $order->customer_name \nTerima kasih sudah berbelanja di $appName\nBerikut detil pesanan anda:\nNama : $order->customer_name \nInvoice : $order->order_ref\nDibuat : $tgl\nTotal :  $total\n\nSegera lakukan pembayaran sebelum $expiredDate agar pesanan anda dapat diproses, Terimakasih.";
 
    return [
       'customer_email' => $order->customer_email,
@@ -140,10 +139,9 @@ function generateAdminEmailOrderCreated($order)
    $name = $order->customer_name;
    $email = $order->customer_email;
    $phone = $order->customer_whatsapp;
-   $courier = $order->shipping_courier_name;
    $total = 'Rp. ' . number_format($order->order_total, 0, ",", ".");
 
-   $body = "Halo Admin $appName,\nSelamat ada pesanan baru!\nDetil Pesanan:\nInvoice : $invoiceId\nNama   : $name\nEmail: $email\nPhone: $phone\nOrder Total : $total\nKurir : $courier\nMetode Pembayaran : $paymentMethod";
+   $body = "Halo Admin $appName,\nSelamat ada pesanan baru!\nDetil Pesanan:\nInvoice : $invoiceId\nNama   : $name\nEmail: $email\nPhone: $phone\nOrder Total : $total\nMetode Pembayaran : $paymentMethod";
 
    return [
       'customer_email' => $order->customer_email,

@@ -20,9 +20,6 @@ class OrderExport implements FromCollection, WithHeadings
       $this->end_date = $end_date;
    }
 
-   /**
-    * @return \Illuminate\Support\Collection
-    */
    public function collection()
    {
       $instance = DB::table('orders')
@@ -42,33 +39,22 @@ class OrderExport implements FromCollection, WithHeadings
          'orders.customer_name',
          'orders.customer_email',
          'orders.customer_whatsapp',
-         'orders.shipping_address',
          'orders.order_status',
          DB::raw("CONCAT(order_items.name, ' ', IFNULL(order_items.note, '')) as product_name"),
          'order_items.price',
          'order_items.quantity',
          'orders.order_subtotal',
          'orders.voucher_discount',
-         'orders.shipping_cost',
-         'orders.shipping_discount',
          'orders.order_unique_code',
          'orders.payment_fee',
          'orders.service_fee',
          DB::raw('orders.order_total + orders.payment_fee as billing_total'),
-         'orders.shipping_courier_name',
-         'orders.shipping_courier_service',
-         'orders.shipping_courier_code',
          'transactions.payment_name',
          'transactions.payment_code',
          'orders.note',
-         // DB::raw("
-         //        GROUP_CONCAT(CONCAT(order_items.name, ' ', IFNULL(order_items.note, ''))  SEPARATOR ', ') as product_name"),
       )
          ->join('order_items', 'order_items.order_id', 'orders.id')
          ->join('transactions', 'transactions.order_id', 'orders.id')
-         // ->groupBy(
-         //    'orders.order_ref',
-         // )
          ->get();
    }
 
@@ -80,22 +66,16 @@ class OrderExport implements FromCollection, WithHeadings
          'Nama',
          'Email',
          'No Telp',
-         'Alamat',
          'Status',
          'Produk',
          'Item Price',
          'Item Qty',
          'Order Subtotal',
          'Voucher Diskon',
-         'Ongkos Kirim',
-         'Diskon Ongkir',
          'Kode Unik',
          'Payment Fee',
          'Jasa Aplikasi',
          'Total bayar',
-         'Kurir',
-         'Kurir Servis',
-         'No Resi',
          'Metode Pembayaran',
          'Kode bayar',
          'Catatan',

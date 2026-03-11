@@ -3,8 +3,9 @@
 // Modern design system foundation
 // ============================================================
 
-// Google Font
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+// Google Font - loaded via preload in prod.template.html for better performance
+// Removed render-blocking @import. Font is now loaded asynchronously.
+// Fallback: system fonts defined in --cs-font-family below.
 
 :root {
   // ── Brand Colors ──────────────────────────────────

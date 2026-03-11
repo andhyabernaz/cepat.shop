@@ -54,14 +54,7 @@ class User extends Authenticatable
       'is_primary' => 'boolean'
    ];
 
-   protected $with = ['address'];
-
    public $appends = ['is_admin', 'permissions'];
-
-   public function address()
-   {
-      return $this->hasMany(UserAddress::class);
-   }
 
    public function role()
    {

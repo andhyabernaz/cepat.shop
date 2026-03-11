@@ -66,7 +66,7 @@ class AffiliateController extends Controller
 
       $paidStatuses = [Order::COMPLETE];
       $unpaidStatuses = [Order::PENDING];
-      $processesStatus = [Order::TO_PROCESS, Order::AWAITING_PICKUP, Order::TOSHIP, Order::SHIPPING];
+      $processesStatus = [Order::TO_PROCESS];
       $failedStatuses = [Order::CANCELED];
 
       if ($request->status) {
@@ -291,7 +291,7 @@ class AffiliateController extends Controller
 
       $paidStatuses = [Order::COMPLETE];
       $unpaidStatuses = [Order::PENDING];
-      $processesStatus = [Order::TO_PROCESS, Order::AWAITING_PICKUP, Order::TOSHIP, Order::SHIPPING];
+      $processesStatus = [Order::TO_PROCESS];
       $failedStatuses = [Order::CANCELED];
 
       if ($request->status) {

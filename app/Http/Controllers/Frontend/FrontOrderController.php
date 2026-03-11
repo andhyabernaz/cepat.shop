@@ -6,7 +6,6 @@ use Exception;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Config;
-use App\Models\Product;
 use App\Models\Voucher;
 use App\Events\OrderPaid;
 use App\Models\Affiliate;
@@ -85,7 +84,7 @@ class FrontOrderController extends Controller
             ->join('product_asset', 'product_asset.product_id', 'products.id')
             ->join('assets', 'product_asset.asset_id', 'assets.id')
             ->where('order_items.id', '>=', $latest)
-            ->where('orders.product_type', Product::PRODUCT_DEFAULT)
+            ->where('orders.product_type', 'like', 'Digital%')
             ->inRandomOrder()
             ->groupBy('orders.id')
             ->get()->map(function ($item) {
@@ -157,24 +156,7 @@ class FrontOrderController extends Controller
          $expired_at = Carbon::now()->addHours($order_expired_time);
 
          $order_status = Order::PENDING;
-         $shipping_type = Order::SHIPPING_COURIER;
-
          $order_status = Order::PENDING;
-         $shipping_type = Order::SHIPPING_COURIER;
-
-         if ($request->shipping_courier_id == Order::SHIPPING_PICKUP) {
-            $shipping_type = Order::SHIPPING_PICKUP;
-            if ($request->payment_type == Order::PAYMEMT_CASH) {
-               $order_status = Order::AWAITING_PICKUP;
-            }
-         }
-
-         if ($request->shipping_courier_id == Order::SHIPPING_COD) {
-            $shipping_type = Order::SHIPPING_COD;
-            if ($request->payment_type == Order::PAYMEMT_COD) {
-               $order_status = Order::TOSHIP;
-            }
-         }
 
          $kode_unik = intval($request->order_unique_code) ?? 0;
 
@@ -184,25 +166,20 @@ class FrontOrderController extends Controller
             'customer_whatsapp' => $request->customer_phone,
             'customer_email' => $request->customer_email ?? NULL,
             'order_qty' => $request->order_qty,
-            'order_weight' => $request->order_weight,
             'order_unique_code' => $kode_unik,
             'order_subtotal' => $request->order_subtotal,
             'order_total' => $request->grand_total,
             'order_status' =>  $order_status,
-            'shipping_type' => $shipping_type,
-            'shipping_address' => $request->shipping_address ?? NULL,
-            'shipping_courier_id' => $request->shipping_courier_id ?? NULL,
-            'shipping_courier_name' => $request->shipping_courier_name ?? NULL,
-            'shipping_courier_service' => $request->shipping_courier_service ?? NULL,
-            'shipping_cost' => $request->shipping_cost ?? 0,
+            'shipping_address' => null,
+            'shipping_cost' => 0,
             'payment_fee' => $payment_fee,
             'service_fee' => $request->service_fee ?? 0,
             'voucher_discount' => $request->voucher_discount ?? 0,
-            'shipping_discount' => $request->shipping_discount ?? 0,
+            'shipping_discount' => 0,
             'expired_at' => $expired_at,
             'product_type' => $product_type,
             'note' => $request->customer_note ?? NULL,
-            'shipping_coordinate' => $request->shipping_coordinate ?? NULL,
+            'shipping_coordinate' => null,
          ]);
 
          foreach ($request->order_items as $item) {
@@ -257,15 +234,6 @@ class FrontOrderController extends Controller
                   'quantity' => 1,
                ];
             }
-            if ($request->shipping_cost > 0) {
-               $items[] = [
-                  'sku' => 'onk',
-                  'name' => "Ongkos Kirim",
-                  'price' => $request->shipping_cost,
-                  'quantity' => 1,
-               ];
-            }
-
             $payload = [
                'method'                => $request->payment_method,
                'merchant_ref'          => $order->order_ref,
@@ -359,11 +327,6 @@ class FrontOrderController extends Controller
          } else {
             $event = NotificationTemplate::ORDER_CREATED;
             $order->dispatchEventMessage($event);
-         }
-
-         if (!$is_product_digital) {
-
-            $order->update_stock();
          }
 
          DB::commit();

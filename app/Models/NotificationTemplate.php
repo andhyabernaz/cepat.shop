@@ -26,7 +26,6 @@ class NotificationTemplate extends Model
    const ORDER_CREATED = 'order_created';
    const ORDER_PAYMENT_SUBMITED = 'payment_submited';
    const ORDER_PAYMENT_CONFIRMED = 'payment_confirmed';
-   const ORDER_SHIPPING = 'order_shipping';
    const ORDER_COMPLETED = 'order_completed';
    const ORDER_FAILED = 'order_failed';
    const REFERAL_COMMISSION = 'referal_commission';
@@ -39,7 +38,6 @@ class NotificationTemplate extends Model
       $data = [
          ['label' => 'USER REGISTRATION', 'value' => self::USER_REGISTRATION],
          ['label' => 'ORDER CREATED', 'value' => self::ORDER_CREATED],
-         ['label' => 'ORDER SHIPPING', 'value' => self::ORDER_SHIPPING],
          ['label' => 'ORDER COMPLETED', 'value' => self::ORDER_COMPLETED],
          ['label' => 'ORDER FAILED', 'value' => self::ORDER_FAILED],
          ['label' => 'PAYMENT SUBMITED', 'value' => self::ORDER_PAYMENT_SUBMITED],
@@ -76,17 +74,12 @@ class NotificationTemplate extends Model
                'order_total',
                'service_fee',
                'kode_unik',
-               'shipping_cost',
-               'shipping_discount',
                'voucher_discount',
                'payment_fee',
                'payment_method',
                'payment_code',
-               'courier',
-               'shipping_address',
                'receiver_name',
                'receiver_phone',
-               'resi_number',
                'order_items',
             ]
          ],
@@ -109,7 +102,7 @@ class NotificationTemplate extends Model
                'referal_description',
             ]
          ],
-          [
+         [
             'label' => 'Withdraw Params',
             'items' => [
                'amount',

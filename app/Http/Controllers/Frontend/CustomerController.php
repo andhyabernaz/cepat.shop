@@ -8,7 +8,6 @@ use App\Models\Config;
 use App\Models\Review;
 use App\Models\Product;
 use App\Models\MutasiSaldo;
-use App\Models\UserAddress;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -31,7 +30,7 @@ class CustomerController extends Controller
 
          $data = Order::when($request->status, function ($q) use ($request) {
             if ($request->status != 'ALL') {
-               $statusArr =  [Order::TO_PROCESS, Order::TOSHIP];
+               $statusArr =  [Order::TO_PROCESS];
                if (in_array($request->status, $statusArr)) {
                   $q->whereIn('order_status', $statusArr);
                } else {
@@ -143,8 +142,6 @@ class CustomerController extends Controller
    {
 
       $user = $request->user();
-
-      UserAddress::where('user_id', $user->id)->delete();
 
       if (env('FORCE_USER_DELETE') == true) {
          $user->forceDelete();

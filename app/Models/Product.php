@@ -20,7 +20,6 @@ class Product extends Model
 
    protected $guarded = [];
 
-   const PRODUCT_DEFAULT = 'Default';
    const PRODUCT_DIGITAL = 'Digital';
    const PRODUCT_DEPOSIT = 'Deposit';
 
@@ -40,7 +39,6 @@ class Product extends Model
 
    public $appends = [
       'short_description', 
-      'is_default_type', 
       'is_digital_download', 
       'is_digital_video',
       'affiliate_detail',
@@ -96,10 +94,6 @@ class Product extends Model
    {
       $desc = $this->description;
       return $desc ? mb_convert_encoding(createTeaser($desc), "UTF-8", "auto") : '';
-   }
-   public function getIsDefaultTypeAttribute()
-   {
-      return $this->product_type == ProductTypeEnum::Default->value;
    }
    public function getIsDigitalVideoAttribute()
    {

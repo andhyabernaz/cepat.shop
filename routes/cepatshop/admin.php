@@ -33,7 +33,6 @@ use App\Http\Controllers\PaymentConfigController;
 use App\Http\Controllers\AffiliateConfigController;
 use App\Http\Controllers\DigitalDownloadController;
 use App\Http\Controllers\Frontend\ReviewController;
-use App\Http\Controllers\Frontend\ShippingController;
 use App\Http\Controllers\NotificationTemplateController;
 
 Route::get('config', [ConfigController::class, 'admin']);
@@ -45,11 +44,9 @@ Route::get('orders/{id}', [OrderController::class, 'show']);
 Route::put('orders/{id}', [OrderController::class, 'update']);
 Route::delete('orders/{id}', [OrderController::class, 'destroy']);
 Route::post('orders/{id}/complete', [OrderController::class, 'completionOrder']);
-Route::post('orders/{id}/ship', [OrderController::class, 'shipOrder']);
 Route::post('orders/{id}/cancel', [OrderController::class, 'cancelOrder']);
 Route::post('orders/{id}/accept-payment', [OrderController::class, 'paymentAccepted']);
 Route::post('orders/{id}/update-status', [OrderController::class, 'updateStatusOrder']);
-Route::post('orders/{id}/input-resi', [OrderController::class, 'inputResi']);
 
 Route::get('userList', [UserController::class, 'userList']);
 Route::apiResource('users', UserController::class);
@@ -161,8 +158,5 @@ Route::apiResource('roles', RoleController::class);
 Route::post('permissions/toggle', [PermissionController::class, 'toggle']);
 Route::get('roles-permissions', [PermissionController::class, 'rolePermissions']);
 Route::get('getUserPermissions', [PermissionController::class, 'getUserPermissions']);
-
-Route::get('shipping/searchAddress', [ShippingController::class, 'configAddress']);
-Route::get('shipping/getCouriers', [ShippingController::class, 'getCouriers']);
 
 

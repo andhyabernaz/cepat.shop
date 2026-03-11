@@ -18,7 +18,7 @@ class OrderService
         if (! $transaction) {
             throw new \Exception("Transaction not found for order #{$order->id}");
         }
-        $order_status = Order::TOSHIP;
+        $order_status = Order::TO_PROCESS;
 
         $is_completion_order = false;
 
@@ -67,10 +67,6 @@ class OrderService
             ]);
 
             $order_status = Order::COMPLETE;
-        } else {
-            if ($order->shipping_type == Order::SHIPPING_PICKUP) {
-                $order_status = Order::AWAITING_PICKUP;
-            }
         }
 
         if (! $order->is_deposit_type()) {

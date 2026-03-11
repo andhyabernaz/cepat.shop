@@ -37,7 +37,6 @@ class ProcessOrderExpired
 
       $msg = "Pesanan dibatalkan, {$event->reason}";
       $order->pushHistory($msg);
-      $order->update_stock(true);
       $order->flush_cache();
    }
 }

@@ -66,15 +66,10 @@ class NotificationService
             DB::raw('orders.order_total + orders.payment_fee as order_total'),
             'transactions.payment_name as payment_method',
             'transactions.payment_code as payment_code',
-            DB::raw("CONCAT(orders.shipping_courier_name, ' ', orders.shipping_courier_service) as courier"),
             'orders.order_subtotal',
-            'orders.shipping_cost',
-            'orders.shipping_address',
             'orders.customer_name as receiver_name',
             'orders.customer_whatsapp as receiver_phone',
-            'orders.shipping_courier_code as resi_number',
             'orders.payment_fee',
-            'orders.shipping_discount',
             'orders.service_fee',
             'orders.voucher_discount',
             'orders.order_unique_code as kode_unik',
@@ -102,8 +97,6 @@ class NotificationService
       $order['payment_fee'] = $this->getPriceFormat($order['payment_fee']);
       $order['order_subtotal'] = $this->getPriceFormat($order['order_subtotal']);
       $order['order_total'] = $this->getPriceFormat($order['order_total']);
-      $order['shipping_cost'] = $this->getPriceFormat($order['shipping_cost']);
-      $order['shipping_address'] = $this->clean_string($order['shipping_address']);
       $order['order_created_date'] = $order['created_date'];
       $order['order_expired_date'] = $order['expired_date'];
       $order['created_date'] = Carbon::parse($order['created_date'])->translatedFormat('D,d M Y h:i');

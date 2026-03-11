@@ -32,13 +32,8 @@ class DashboardController extends Controller
             ),
             DB::raw(
                "SUM(CASE
-                  WHEN orders.order_status = 'TOSHIP' OR orders.order_status = 'TO_PROCESS'
-                  THEN 1 ELSE 0 END) AS 'order_toship'"
-            ),
-            DB::raw(
-               "SUM(CASE
-                  WHEN orders.order_status = 'SHIPPING' OR orders.order_status = 'AWAITING_PICKUP'
-                  THEN 1 ELSE 0 END) AS 'order_shipping'"
+                  WHEN orders.order_status = 'TO_PROCESS'
+                  THEN 1 ELSE 0 END) AS 'order_to_process'"
             ),
             DB::raw(
                "SUM(CASE
@@ -59,29 +54,18 @@ class DashboardController extends Controller
                   'color' => 'purple',
                   'icon' => 'receipt'
                ],
-
-
                [
                   'label' => 'Order Pending',
                   'total' => $report->order_pending ?? 0,
                   'color' => 'grey',
                   'icon' => 'receipt'
                ],
-
                [
-                  'label' => 'Perlu Diproses/kirim',
-                  'total' => $report->order_toship ?? 0,
+                  'label' => 'Perlu Diproses',
+                  'total' => $report->order_to_process ?? 0,
                   'color' => 'orange',
                   'icon' => 'receipt'
                ],
-
-               [
-                  'label' => 'Sedang Dikirim',
-                  'total' => $report->order_shipping ?? 0,
-                  'color' => 'teal',
-                  'icon' => 'receipt'
-               ],
-
                [
                   'label' => 'Order Selesai',
                   'total' => $report->order_complete ?? 0,
@@ -112,16 +96,16 @@ class DashboardController extends Controller
       Cache::forget($cacheKey);
 
       $transactions = Cache::remember(
-         $cacheKey ,
+         $cacheKey,
          now()->addMinutes(15),
          function () use ($request) {
             return DB::table('orders')->select(
                DB::raw("SUM(orders.order_total + orders.payment_fee) AS 'total'"),
-               DB::raw("SUM(transactions.fee_merchant + orders.shipping_discount) AS 'expenses'"),
+               DB::raw("SUM(transactions.fee_merchant) AS 'expenses'"),
             )
                ->join('transactions', 'transactions.order_id', 'orders.id')
                ->where('transactions.status', 'PAID')
-               ->when($request->period, function($q) use ($request) {
+               ->when($request->period, function ($q) use ($request) {
                   switch ($request->period) {
                      case 'today':
                         $q->whereDate('orders.created_at', Carbon::now());
@@ -132,9 +116,8 @@ class DashboardController extends Controller
                      case 'yearly':
                         $q->whereYear('orders.created_at', Carbon::now());
                         break;
-                     
+
                      default:
-                        # code...
                         break;
                   }
                })
@@ -156,7 +139,7 @@ class DashboardController extends Controller
                         'total' => $expenses,
                         'color' => 'red',
                         'icon' => 'monetization_on',
-                        'desc' => 'Diskon Ongkir dan Layanan payment gateway'
+                        'desc' => 'Biaya layanan payment gateway'
                      ],
                      [
                         'label' => 'Total Penghasilan',
