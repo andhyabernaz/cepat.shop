@@ -153,8 +153,19 @@ module.exports = configure(function (ctx) {
                   fse.copySync(composeDistPath(fileName), composeServerPath(fileName));
                }
             }
+            const distIndexPath = composeDistPath(indexFilename);
+            let html = fse.readFileSync(distIndexPath, 'utf8');
+
+            const bladeBaseTag = '<base href="{{ url(\'/\') }}/">';
+            const hasBase = /<base\b/i.test(html);
+            if (hasBase) {
+               html = html.replace(/<base\s+href=(["'])?\/auto\/\1\s*>/i, bladeBaseTag);
+            } else {
+               html = html.replace(/<head(\s[^>]*)?>/i, (match) => `${match}${bladeBaseTag}`);
+            }
+
             fse.removeSync(composeViewPath(appFileName));
-            fse.copySync(composeDistPath(indexFilename), composeViewPath(appFileName));
+            fse.writeFileSync(composeViewPath(appFileName), html, 'utf8');
 
          },
 

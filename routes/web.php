@@ -19,6 +19,12 @@ use App\Http\Controllers\Install\InstallController;
 
 // MOHON UNTUK TIDAK MENGEDIT ROUTE DIBAWAH
 Route::get('/install', [InstallController::class, 'index'])->name('install');
+Route::any('/auto/cepat', function () {
+   abort(404);
+});
+Route::any('/auto/cepat/{any?}', function () {
+   abort(404);
+})->where('any', '.*');
 Route::middleware([Installed::class])->group(
    function () {
       Route::get('/', [FrontController::class, 'homepage']);

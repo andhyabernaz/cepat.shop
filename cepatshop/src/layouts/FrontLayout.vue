@@ -12,7 +12,7 @@
             <div class="flex q-gutter-x-sm cursor-pointer items-center cs-brand-link" @click="$router.push('/')"
                :class="{ 'col-auto': is_mode_desktop, 'col': !is_mode_desktop }">
                <img v-if="shop" class="logo cs-logo" :src="shop.logo ? shop.logo : '/icon/icon-192x192.png'" alt="Logo" />
-               <div v-if="shop && shop.name && config.display_sitename" class="cs-brand-name text-weight-bold text-no-wrap">
+               <div v-if="shop && shop.name && config && config.display_sitename" class="cs-brand-name text-weight-bold text-no-wrap">
                   {{ shop.name }}</div>
             </div>
             <div class="col q-mx-lg q-pa-sm" v-if="is_mode_desktop">
