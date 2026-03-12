@@ -150,16 +150,6 @@
             <q-card-section>
                <div class="card-title q-mb-md">Pilih Tipe Produk</div>
                <q-list separator>
-                  <q-item :to="{ name: 'ProductCreate', query: { type: 'Default' } }">
-                     <q-item-section side>
-                        <q-icon name="chevron_right"></q-icon>
-                     </q-item-section>
-                     <q-item-section>
-                        <q-item-label>Produk Fisik</q-item-label>
-                        <q-item-label caption>Jual produk fisik</q-item-label>
-                     </q-item-section>
-                  </q-item>
-
                   <q-item :to="{ name: 'ProductDownloadForm', query: { type: 'Digital' } }">
                      <q-item-section side>
                         <q-icon name="chevron_right"></q-icon>
@@ -219,10 +209,7 @@ export default {
          },
          product_types: [
             { label: 'Semua', value: 'ALL' },
-            { label: 'Produk Fisik', value: 'Default' },
             { label: 'Produk Digital', value: 'Digital' },
-            // { label: 'Digital Download', value: 'Digital Download' },
-            // { label: 'Digital Video', value: 'Digital Video' },
          ],
       };
    },

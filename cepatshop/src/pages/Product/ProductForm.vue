@@ -311,7 +311,7 @@ export default {
             has_subvarian: false,
             simple_product: true,
             marketplaces: [],
-            product_type: 'Default',
+            product_type: 'Digital',
             aff_is_active: false,
             aff_is_percentage: false,
             aff_amount: 0,
@@ -602,7 +602,8 @@ export default {
    },
    mounted() {
       if (this.$route.query.type) {
-         this.form.product_type = this.$route.query.type
+         const allowedTypes = ['Digital', 'Digital Download', 'Digital Video', 'Deposit']
+         this.form.product_type = allowedTypes.includes(this.$route.query.type) ? this.$route.query.type : 'Digital'
       }
    },
    created() {

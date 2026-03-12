@@ -201,25 +201,9 @@ export default {
          return this.$store.state.session_id;
       },
       isCanChekout: function () {
-         if (
-            this.cart_order_form.items.length &&
-            this.config &&
-            (this.config.can_checkout_local || this.config.can_checkout_pickup || this.config.can_checkout_courier)
-         ) {
-            return true;
-         }
-         if(this.cart_order_form.is_digital && this.config && this.config.can_checkout_digital) {
-            return true
-         }
-         return false
+         return this.cart_order_form.items.length && this.config && this.config.can_checkout_digital
       },
       isCanCheckoutDirectWithShipping() {
-         if (this.cart_order_form.items.length && this.shop.phone) {
-            if (this.config.can_cod || this.config.can_shipping) {
-               return true;
-            }
-         }
-
          return false;
       },
       isCanCheckoutWhatsapp() {
@@ -311,11 +295,7 @@ export default {
          }
       },
       checkoutWhatsapp() {
-         if (this.config.can_shipping) {
-            this.$router.push({ name: "DirectCheckout" });
-         } else {
-            this.directCheckoutModal = true;
-         }
+         this.directCheckoutModal = true;
       },
       setQty(e, cart) {
          let qty = e.target.value;

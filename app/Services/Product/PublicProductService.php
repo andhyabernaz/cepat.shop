@@ -8,6 +8,7 @@ use App\Models\Config;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Marketplace;
+use App\Enums\ProductTypeEnum;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Resources\ProductListCollection;
 
@@ -28,8 +29,12 @@ class PublicProductService
          ])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
-            ->where('slug', $slug)
-            ->orWhere('id', $slug)
+            ->where('status', 1)
+            ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues())
+            ->where(function ($query) use ($slug) {
+               $query->where('slug', $slug)
+                  ->orWhere('id', $slug);
+            })
             ->groupBy('products.id')
             ->firstOrFail();
       });
@@ -52,7 +57,9 @@ class PublicProductService
          $order_by = $config->home_product_sort ?? 'DESC';
       }
 
-      $instance  = Product::query();
+      $instance  = Product::query()
+         ->where('status', 1)
+         ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues());
 
       if ($order_by == 'RANDOM') {
          $instance->inRandomOrder();
@@ -106,7 +113,9 @@ class PublicProductService
 
          $product = Product::findOrFail($id);
 
-         $instance  = Product::query();
+         $instance  = Product::query()
+            ->where('status', 1)
+            ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues());
 
          if ($product->category_id) {
 
@@ -177,6 +186,8 @@ class PublicProductService
       return Product::with(['minPrice', 'assets', 'category:id,title,slug', 'productPromo' => function ($query) {
          $query->whereHas('promoActive');
       }])
+         ->where('status', 1)
+         ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues())
          ->whereIn('id', $pids)
          ->withAvg('reviews', 'rating')
          ->get();
@@ -188,6 +199,8 @@ class PublicProductService
       return Product::with(['minPrice', 'assets', 'category:id,title,slug', 'productPromo' => function ($query) {
          $query->whereHas('promoActive');
       }])
+         ->where('status', 1)
+         ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues())
          ->where('title', 'like', '%' . $key . '%')
          ->withAvg('reviews', 'rating')
          ->get();
@@ -216,7 +229,9 @@ class PublicProductService
             $ids = array_merge($ids, $cids);
          }
 
-         $instance  = Product::query();
+         $instance  = Product::query()
+            ->where('status', 1)
+            ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues());
 
          if ($order_by == 'RANDOM') {
             $instance->inRandomOrder();
@@ -256,6 +271,8 @@ class PublicProductService
          });
          $query->withSum('varianItems as total_stock', 'stock');
          $query->withAvg('reviews', 'rating');
+         $query->where('status', 1);
+         $query->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues());
       }])
          ->whereHas('products')
          ->get()->map(function ($item) {

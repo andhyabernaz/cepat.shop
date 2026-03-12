@@ -247,14 +247,21 @@ class FrontApiController extends Controller
 
     public function getVoucherActive()
     {
-        $data = Voucher::withCount('orders')->active()->get();
+        $data = Voucher::withCount('orders')
+            ->where('is_type_shipping', false)
+            ->active()
+            ->get();
 
         return ApiResponse::success($data);
     }
 
     public function getVoucherByCode($voucher_code)
     {
-        $data = Voucher::withCount('orders')->where('voucher_code', $voucher_code)->active()->first();
+        $data = Voucher::withCount('orders')
+            ->where('voucher_code', $voucher_code)
+            ->where('is_type_shipping', false)
+            ->active()
+            ->first();
 
         return ApiResponse::success($data);
     }

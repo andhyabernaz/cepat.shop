@@ -65,6 +65,12 @@ class Config extends Model
       'is_bank_ready',
       'is_mail_ready',
       'can_checkout_digital',
+      'can_checkout_courier',
+      'can_checkout_pickup',
+      'can_checkout_local',
+      'can_shipping',
+      'can_cod',
+      'is_shippable',
       'tripay_callback',
       'xendit_callback',
       'midtrans_callback',
@@ -146,6 +152,36 @@ class Config extends Model
       if ($this->hasPayment()) {
          return true;
       }
+      return false;
+   }
+
+   public function getCanCheckoutCourierAttribute()
+   {
+      return false;
+   }
+
+   public function getCanCheckoutPickupAttribute()
+   {
+      return false;
+   }
+
+   public function getCanCheckoutLocalAttribute()
+   {
+      return false;
+   }
+
+   public function getCanShippingAttribute()
+   {
+      return false;
+   }
+
+   public function getCanCodAttribute()
+   {
+      return false;
+   }
+
+   public function getIsShippableAttribute()
+   {
       return false;
    }
 

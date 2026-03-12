@@ -106,7 +106,7 @@ export default {
          return
       }
       if (this.config) {
-         if (!this.config.can_checkout_local && !this.config.can_checkout_pickup && !this.config.can_checkout_courier && !this.config.can_checkout_digital) {
+         if (!this.config.can_checkout_digital) {
             this.$router.back()
          }
       }

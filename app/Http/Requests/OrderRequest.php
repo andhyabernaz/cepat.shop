@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ProductTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class OrderRequest extends FormRequest
 {
@@ -14,7 +16,7 @@ class OrderRequest extends FormRequest
    public function rules()
    {
       $rule = [
-         'product_type' => ['required'],
+         'product_type' => ['required', Rule::in(ProductTypeEnum::getNonPhysicalValues())],
          'customer_name' => ['required', 'string'],
          'customer_phone' => ['required', 'string'],
          'customer_email' => ['required', 'email'],

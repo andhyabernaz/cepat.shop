@@ -147,6 +147,10 @@ class FrontOrderController extends Controller
 
          $product_type = $request->product_type;
 
+         if (!in_array($product_type, ProductTypeEnum::getNonPhysicalValues(), true)) {
+            return ApiResponse::failed('Checkout produk fisik sudah dinonaktifkan.');
+         }
+
          if (ProductTypeEnum::isDigital($product_type)) {
             $is_product_digital = true;
          }

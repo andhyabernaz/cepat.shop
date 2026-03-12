@@ -19,7 +19,7 @@ export const getChartOrderForm = (state, getters, rootState) => {
    let subtotal = sumSubtotal(state.carts)
    let weight = sumWeight(state.carts)
    let qty = sumQty(state.carts)
-   let shipping_cost = state.courier ? parseInt(state.courier.price) : 0
+   let shipping_cost = 0
    let unique_code = 0
    if (rootState.config && rootState.config.is_unique_code) {
       unique_code = getUniqueCode(state)
@@ -30,7 +30,7 @@ export const getChartOrderForm = (state, getters, rootState) => {
    let total = parseInt(subtotal) + parseInt(shipping_cost) + parseInt(unique_code) + parseInt(service_fee);
 
    let voucher_discount = getVoucherDiscount(state, subtotal)
-   let shipping_discount = getShippingDiscount(state, shipping_cost)
+   let shipping_discount = 0
 
    let grandTotal = parseInt(total) - (parseInt(voucher_discount) + parseInt(shipping_discount));
    let billing_total = parseInt(grandTotal) + parseInt(payment_fee)
@@ -86,18 +86,6 @@ function getVoucherDiscount(state, subtotal) {
    }
    return parseInt(current_discount)
 }
-function getShippingDiscount(state, shipping_cost) {
-
-   let current_discount = 0
-
-   if (state.voucher && state.voucher.is_type_shipping == true) {
-      let calculate_discount = parseInt(state.voucher.discount_amount)
-
-      current_discount = calculate_discount > shipping_cost ? shipping_cost : calculate_discount
-   }
-   return parseInt(current_discount)
-}
-
 function sumSubtotal(items) {
    let subtotal = 0
    if (items && items.length) {

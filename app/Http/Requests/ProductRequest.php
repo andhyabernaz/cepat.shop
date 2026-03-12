@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\ProductTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProductRequest extends FormRequest
 {
@@ -16,6 +17,7 @@ class ProductRequest extends FormRequest
    {
       $rules = [
          'title' => 'required|string|max:190',
+         'product_type' => ['required', Rule::in(ProductTypeEnum::getNonPhysicalValues())],
          'price' => 'required',
          'description' => 'required',
          'aff_amount' => 'numeric',

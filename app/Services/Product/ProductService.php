@@ -45,6 +45,7 @@ class ProductService
             DB::raw("SUM(CASE WHEN product_varians.has_subvarian = 0 THEN product_varians.stock ELSE 0 END) as total_stock"),
          )
          ->leftJoin('product_varians', 'products.id', 'product_varians.product_id')
+         ->whereIn('products.product_type', ProductTypeEnum::getNonPhysicalValues())
          ->orderByDesc('products.id')
          ->groupBy('products.id')
          ->when($request->search, function ($q) use ($request) {
@@ -76,12 +77,14 @@ class ProductService
    public function show($id)
    {
       return Product::with('assets', 'category', 'varians.subvarian', 'links', 'digitalDownloads', 'digitalVideos')
+         ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues())
          ->where('id', $id)
          ->first();
    }
    public function edit($id)
    {
       return Product::with('assets', 'category', 'varians.subvarian')
+         ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues())
          ->where('id', $id)
          ->first();
    }
@@ -513,6 +516,7 @@ class ProductService
    public function search($keyword, $limit = 20)
    {
       return Product::where('title', 'like', '%' . $keyword . '%')
+         ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues())
          ->with(['minPrice', 'maxPrice', 'featuredImage', 'category', 'varianItems.parent'])
          ->paginate($limit);
    }

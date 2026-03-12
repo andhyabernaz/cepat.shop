@@ -22,4 +22,14 @@ enum ProductTypeEnum: string
    {
       return array_map(fn($case) => $case->value, self::cases());
    }
+
+   public static function getNonPhysicalValues(): array
+   {
+      return [
+         self::Digital->value,
+         self::Deposit->value,
+         self::DigitalDownload->value,
+         self::DigitalVideo->value,
+      ];
+   }
 }

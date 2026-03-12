@@ -51,6 +51,3 @@ export function getInvoice({ }, order_ref) {
 export function storeOrder({ }, payload) {
    return Api.post('storeorder', payload)
 }
-export function shippingWaybill({ }, waybill) {
-   return Api.get('shipping/tracking/' + waybill)
-}

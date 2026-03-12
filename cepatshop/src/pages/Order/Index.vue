@@ -39,28 +39,6 @@
                            </q-item>
 
                            <q-item clickable class="" unelevated no-caps padding="6px 12px" size="12px"
-                              v-if="order.can_input_resi && $can('manage-order')" color="teal"
-                              @click="handleInputResi(order)">
-                              <q-item-section>
-                                 {{
-                                    order.shipping_courier_code ? "Update Resi" : "Input Resi"
-                                 }}
-                              </q-item-section>
-                           </q-item>
-
-                           <q-item clickable class="" unelevated no-caps padding="6px 12px" size="12px"
-                              v-if="order.can_shipping && $can('manage-order')" color="blue"
-                              @click="handleShippingOrder(order)">
-                              <q-item-section>
-                                 {{
-                                    order.shipping_courier_id == "COD"
-                                       ? "Antar COD"
-                                       : "Kirim Order"
-                                 }}
-                              </q-item-section>
-                           </q-item>
-
-                           <q-item clickable class="" unelevated no-caps padding="6px 12px" size="12px"
                               v-if="order.can_confirm_payment && $can('accept-payment-order')" color="blue"
                               @click="handleConfirmationOrder(order)">
                               <q-item-section>Konfirmasi Pembayaran</q-item-section>
@@ -152,27 +130,6 @@
                               {{ order.transaction.payment_type.split('_').join(' ') }}
                            </td>
                         </tr>
-                        <tr>
-                           <td>Pengiriman</td>
-                           <td>
-                              {{
-                                 order.shipping_courier_id == "COD"
-                                    ? "Diantar Kurir Toko"
-                                    : order.shipping_courier_name
-                              }}
-                           </td>
-                        </tr>
-
-                        <tr>
-                           <td>No Resi</td>
-                           <td>
-                              {{
-                                 order.shipping_courier_code
-                                    ? order.shipping_courier_code
-                                    : "-"
-                              }}
-                           </td>
-                        </tr>
                         <tr v-if="['PENDING', 'TOSHIP'].includes(order.order_status)">
                            <td>Expired At</td>
                            <td>{{ dateFormat(order.expired_at, { hour: 'numeric', minute: 'numeric' }) }}</td>
@@ -192,27 +149,6 @@
       </div>
       <q-dialog v-model="followUpModal" persistent>
          <follow-up @close="followUpModal = false" :order="currentOrder" />
-      </q-dialog>
-
-      <q-dialog v-model="inputResiModal">
-         <q-card square style="width: 100%; max-width: 420px">
-            <div class="q-px-md q-py-sm bg-dark text-white text-weight-bold">
-               Input Resi
-               <span v-if="orderSelected"># {{ orderSelected.order_ref }}</span>
-            </div>
-            <form @submit.prevent="submitResi">
-               <q-card-section>
-                  <div class="text-grey-8">No Resi</div>
-                  <q-input outlined v-model="form.resi" :rules="[(val) => (val && val.length > 0) || 'Wajib diisi']" />
-                  <q-checkbox label="Update Status ( Dikirim )" v-model="form.update_to_ship"
-                     v-if="orderSelected.order_status == 'TOSHIP'"></q-checkbox>
-                  <div class="flex justify-end q-mt-sm q-gutter-x-sm">
-                     <q-btn outline label="Batal" @click.prevent="closeModal" color="primary"></q-btn>
-                     <q-btn unelevated type="submit" label="Simpan" color="primary"></q-btn>
-                  </div>
-               </q-card-section>
-            </form>
-         </q-card>
       </q-dialog>
 
       <q-dialog v-model="exportModal" position="right">
@@ -259,16 +195,8 @@ export default {
             start_date: "",
             end_date: "",
          },
-         inputResiModal: false,
-         orderSelected: "",
          followUpModal: false,
          currentOrder: null,
-         form: {
-            order_id: "",
-            resi: "",
-            status: "",
-            update_to_ship: false,
-         },
          queryParams: {
             search: "",
             status: this.$route.query.status ?? "ALL",
@@ -310,13 +238,11 @@ export default {
          "getOrders",
          "destroyOrder",
          "acceptPayment",
-         "inputResi",
          "updateStatusOrder",
          "cancelOrder",
          "destroyOrder",
          'getStatusOptions',
-         'completionOrder',
-         'shippingOrder'
+         'completionOrder'
       ]),
       getProductTypeCOlor(type) {
          if (type.includes('Digital')) {
@@ -351,20 +277,6 @@ export default {
          this.queryParams.status = status;
          this.$router.replace({ name: "OrderIndex", query: { status: status } });
          this.getData();
-      },
-      handleShippingOrder(order) {
-         this.$q
-            .dialog({
-               title: "Konfirmasi",
-               message:
-                  'Akan mengirim pesanan sekarang?, ini akan merubah status pesanan menjadi "sedang dikirim"',
-               cancel: true,
-            })
-            .onOk(() => {
-               this.shippingOrder(order.id).then(() => {
-                  this.getData()
-               })
-            });
       },
       getInvoiceRoutePath(ref) {
          let props = this.$router.resolve({
@@ -477,24 +389,6 @@ export default {
       handleFollowUp(data) {
          this.currentOrder = data;
          this.followUpModal = true;
-      },
-      handleInputResi(order) {
-         this.form.resi = order.shipping_courier_code ?? "";
-         this.form.update_to_ship = false;
-         this.orderSelected = order;
-         this.form.order_id = order.id;
-         this.inputResiModal = true;
-      },
-      closeModal() {
-         this.inputResiModal = false;
-         this.orderSelected = "";
-         this.form.order_id = "";
-      },
-      submitResi() {
-         this.inputResi(this.form).then((res) => {
-            this.getData();
-         });
-         this.closeModal();
       },
       exportData() {
          let url = "export/orders";

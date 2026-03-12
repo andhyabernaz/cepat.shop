@@ -17,13 +17,6 @@
             <OrderConfig />
          </q-tab-panel>
 
-         <q-tab-panel class="q-pa-none" name="ShippingConfig">
-            <ShippingConfig />
-         </q-tab-panel>
-         <q-tab-panel class="q-pa-none" name="Local">
-            <LocalShipping />
-         </q-tab-panel>
-
          <q-tab-panel class="q-pa-none" name="Notifikasi">
             <notification />
          </q-tab-panel>
@@ -53,12 +46,10 @@
 </template>
 
 <script>
-import ShippingConfig from "./ShippingConfig.vue";
 import BasicConfig from "./BasicConfig.vue";
 import Notification from "./NotificationConfig.vue";
 import OrderConfig from "./OrderConfig.vue";
 import SystemUpdate from "./SystemUpdate.vue";
-import LocalShipping from "./LocalShippingConfig.vue";
 import WagatewayConfig from "./WagatewayConfig.vue";
 import PaymentConfig from "./PaymentConfig.vue";
 import MetaConfig from "./MetaConfig.vue";
@@ -68,12 +59,10 @@ import SaldoConfig from "./SaldoConfig.vue";
 export default {
    name: "AppConfigIndex",
    components: {
-      ShippingConfig,
       BasicConfig,
       Notification,
       OrderConfig,
       SystemUpdate,
-      LocalShipping,
       WagatewayConfig,
       PaymentConfig,
       MarketplaceConfig,
@@ -87,8 +76,6 @@ export default {
          tabs: [
             { ability: 'view-config',value: "BasicConfig", label: "Basic" },
             { ability: 'order-config',value: "Order", label: "Order Config" },
-            { ability: 'shipping-config',value: "ShippingConfig", label: "Ekspedisi" },
-            { ability: 'shipping-config',value: "Local", label: "Pickup dan Kurir toko" },
             { ability: 'smtp-config',value: "Notifikasi", label: "SMTP / Telegram" },
             { ability: 'whatsapp-gateway-config',value: "Wagateway", label: "Whatsapp Gateway" },
             { ability: 'payment-gateway-config',value: "PaymentConfig", label: "Payment Gateway" },
