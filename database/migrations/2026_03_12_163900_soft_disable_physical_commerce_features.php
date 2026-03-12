@@ -25,7 +25,6 @@ return new class extends Migration
             }
 
             $nullableColumns = [
-                'courier_default',
                 'warehouse_id',
                 'warehouse_address',
                 'rajaongkir_apikey',
@@ -35,12 +34,22 @@ return new class extends Migration
                 'biteship_warehouse',
                 'warehouse_coordinate',
                 'local_shipping_costs',
-                'local_shipping_label',
             ];
 
             foreach ($nullableColumns as $column) {
                 if (Schema::hasColumn('configs', $column)) {
                     $updates[$column] = null;
+                }
+            }
+
+            $defaultValueColumns = [
+                'courier_default' => 'Rajaongkir',
+                'local_shipping_label' => 'Via Kurir Toko',
+            ];
+
+            foreach ($defaultValueColumns as $column => $value) {
+                if (Schema::hasColumn('configs', $column)) {
+                    $updates[$column] = $value;
                 }
             }
 

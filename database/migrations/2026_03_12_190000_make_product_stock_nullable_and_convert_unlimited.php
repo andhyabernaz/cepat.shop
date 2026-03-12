@@ -9,13 +9,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::table('products')
-            ->where('stock', -1)
-            ->update(['stock' => null]);
-
         Schema::table('products', function (Blueprint $table) {
             $table->integer('stock')->nullable()->change();
         });
+
+        DB::table('products')
+            ->where('stock', -1)
+            ->update(['stock' => null]);
     }
 
     public function down(): void
