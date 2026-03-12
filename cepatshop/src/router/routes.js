@@ -28,7 +28,7 @@ const routes = [
       component: () => import('src/layouts/BlankLayout.vue'),
       children: [
          { path: 'checkout', name: 'Checkout', component: () => import('src/pages/Checkout/Index.vue') },
-         { path: 'direct-checkout', name: 'DirectCheckout', component: () => import('src/pages/Checkout/Index.vue') },
+         { path: 'direct-checkout', name: 'DirectCheckout', component: () => import('src/pages/Checkout/DirectCheckout.vue') },
          { path: 'invoice/:order_ref', name: 'UserInvoice', component: () => import('src/pages/Invoice/Index.vue') },
       ]
    },

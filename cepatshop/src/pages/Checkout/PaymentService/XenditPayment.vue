@@ -33,11 +33,17 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 
 const emits = defineEmits(['onClose'])
+const props = defineProps({
+   source: {
+      type: String,
+      default: 'cart',
+   },
+})
 
 const store = useStore()
 
 const cart_order_form = computed(() => {
-   return store.getters["cart/getChartOrderForm"];
+   return store.getters[`${props.source}/getChartOrderForm`];
 })
 const render_payments = computed(() => {
    return [
@@ -61,7 +67,7 @@ const is_selected_payment = (id) => {
    return false;
 }
 const selectPayment = (item) => {
-   store.commit("cart/SET_PAYMENT", item);
+   store.commit(`${props.source}/SET_PAYMENT`, item);
    store.commit("CLEAR_ERRORS");
    emits('onClose', 1)
 }

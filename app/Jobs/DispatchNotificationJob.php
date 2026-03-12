@@ -66,6 +66,9 @@ class DispatchNotificationJob implements ShouldQueue
          if ($template->role == Message::RoleCustomer) {
             if ($template->via == Message::VIA_EMAIL) {
                $recipient = $user ? $user->email : null;
+               if ($is_order && ! $recipient) {
+                  $recipient = $this->model->customer_email;
+               }
             }
             if ($template->via == Message::VIA_WHATSAPP) {
                if ($user) {

@@ -6,7 +6,6 @@ use Exception;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Config;
-use App\Models\Voucher;
 use App\Events\OrderPaid;
 use App\Models\Affiliate;
 use App\Models\OrderItem;
@@ -21,17 +20,17 @@ use Illuminate\Support\Carbon;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\OrderRequest;
-use Illuminate\Support\Facades\Log;
 use App\Enums\MutasiSaldoStatusEnum;
 use App\Models\NotificationTemplate;
 use Illuminate\Support\Facades\Cache;
-use App\Services\Payment\TripayService;
+use App\Services\Order\CheckoutOrderService;
 use App\Services\Payment\PaymentService;
 
 class FrontOrderController extends Controller
 {
    public function __construct(
-      protected PaymentService $paymentService
+      protected PaymentService $paymentService,
+      protected CheckoutOrderService $checkoutOrderService
    ) {}
 
    public function getInvoice($invoice)
@@ -108,22 +107,10 @@ class FrontOrderController extends Controller
 
       $user = auth('sanctum')->user();
 
-      if ($request->voucher_id) {
-
-         $v = Voucher::withCount('orders')->where('id', $request->voucher_id)->first();
-
-         if ($v->usage_quota > 0 && $v->usage_quota <= $v->orders_count) {
-
-            return ApiResponse::failed('Kuota pemakaian voucher habis, silahkan ganti voucher yang lain');
-         }
-         if ($v->end_date < now()) {
-            return ApiResponse::failed('Masa aktif voucher telah kadaluarsa, silahkan ganti voucher yang lain');
-         }
-      }
-
       DB::beginTransaction();
 
       try {
+         $checkout = $this->checkoutOrderService->prepare($request->validated());
 
          $config = Config::first();
          $order_expired_time = (int) $config->order_expired_time;
@@ -136,16 +123,16 @@ class FrontOrderController extends Controller
          $is_cash_payment = $request->payment_type == PaymentTypeEnum::PAYMEMT_CASH->value;
          $is_cod_payment = $request->payment_type == PaymentTypeEnum::PAYMEMT_COD->value;
 
-         $payment_fee = $request->payment_fee ? intval($request->payment_fee) : 0;
-         $service_fee = $request->service_fee ?? 0;
+         $payment_fee = $checkout['payment_fee'];
+         $service_fee = $checkout['service_fee'];
 
-         $grand_total = $request->grand_total;
+         $grand_total = $checkout['grand_total'];
 
          $is_free_product = $grand_total == 0;
 
          $is_product_digital = false;
 
-         $product_type = $request->product_type;
+         $product_type = $checkout['product_type'];
 
          if (!in_array($product_type, ProductTypeEnum::getNonPhysicalValues(), true)) {
             return ApiResponse::failed('Checkout produk fisik sudah dinonaktifkan.');
@@ -162,31 +149,38 @@ class FrontOrderController extends Controller
          $order_status = Order::PENDING;
          $order_status = Order::PENDING;
 
-         $kode_unik = intval($request->order_unique_code) ?? 0;
+         $kode_unik = $checkout['unique_code'];
+         $shipping = $checkout['shipping'];
 
          $order = Order::create([
             'user_id' => $user ? $user->id : null,
             'customer_name' => $request->customer_name,
             'customer_whatsapp' => $request->customer_phone,
             'customer_email' => $request->customer_email ?? NULL,
-            'order_qty' => $request->order_qty,
+            'order_qty' => $checkout['qty'],
+            'order_weight' => $checkout['weight'],
             'order_unique_code' => $kode_unik,
-            'order_subtotal' => $request->order_subtotal,
-            'order_total' => $request->grand_total,
+            'order_subtotal' => $checkout['subtotal'],
+            'order_total' => $checkout['grand_total'],
             'order_status' =>  $order_status,
-            'shipping_address' => null,
-            'shipping_cost' => 0,
+            'shipping_type' => $shipping['type'],
+            'shipping_courier_id' => $shipping['id'],
+            'shipping_courier_code' => $shipping['code'],
+            'shipping_courier_name' => $shipping['name'],
+            'shipping_courier_service' => $shipping['service'],
+            'shipping_address' => $shipping['address'],
+            'shipping_cost' => $shipping['cost'],
             'payment_fee' => $payment_fee,
-            'service_fee' => $request->service_fee ?? 0,
-            'voucher_discount' => $request->voucher_discount ?? 0,
-            'shipping_discount' => 0,
+            'service_fee' => $service_fee,
+            'voucher_discount' => $checkout['voucher_discount'],
+            'shipping_discount' => $checkout['shipping_discount'],
             'expired_at' => $expired_at,
             'product_type' => $product_type,
             'note' => $request->customer_note ?? NULL,
-            'shipping_coordinate' => null,
+            'shipping_coordinate' => $shipping['coordinate'],
          ]);
 
-         foreach ($request->order_items as $item) {
+         foreach ($checkout['items'] as $item) {
 
             if (intval($item['price']) > 0 && $user) {
                $affiliate = null;
@@ -220,7 +214,7 @@ class FrontOrderController extends Controller
 
             $items = [];
 
-            foreach ($request->order_items as $row) {
+            foreach ($checkout['items'] as $row) {
                $item = [
                   'sku' => $row['sku'],
                   'name' => $row['name'],
@@ -312,8 +306,8 @@ class FrontOrderController extends Controller
 
             $transaction->save();
          }
-         if ($request->voucher_id) {
-            $order->vouchers()->attach($request->voucher_id);
+         if ($checkout['voucher']) {
+            $order->vouchers()->attach($checkout['voucher']->id);
          }
 
          if ($is_saldo_balance) {

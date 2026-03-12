@@ -71,12 +71,16 @@
 export default {
    name: 'ReviewOrder',
    props: {
+      source: {
+         type: String,
+         default: 'cart'
+      },
       payment: Object,
       noPayment: Boolean
    },
    computed: {
       cart_order_form() {
-         return this.$store.getters['cart/getChartOrderForm']
+         return this.$store.getters[`${this.source}/getChartOrderForm`]
       },
       config() {
          return this.$store.state.config

@@ -59,11 +59,11 @@
 
                <div v-else>
                   <q-list separator>
-                     <DirectPayment :payment_chanels="direct_payments" @onClose="closeModal"></DirectPayment>
-                     <TripayPayment :payment_chanels="payment_chanels" v-if="is_tripay_payment" @onClose="closeModal"></TripayPayment>
-                     <XenditPayment v-if="is_xendit_payment" @onClose="closeModal"></XenditPayment>
-                     <MidtransPayment v-if="is_midtrans_payment" @onClose="closeModal"></MidtransPayment>
-                     <DuitkuPayment :payment_chanels="payment_chanels" v-if="is_duitku_payment" @onClose="closeModal"></DuitkuPayment>
+                     <DirectPayment :source="source" :payment_chanels="direct_payments" @onClose="closeModal"></DirectPayment>
+                     <TripayPayment :source="source" :payment_chanels="payment_chanels" v-if="is_tripay_payment" @onClose="closeModal"></TripayPayment>
+                     <XenditPayment :source="source" v-if="is_xendit_payment" @onClose="closeModal"></XenditPayment>
+                     <MidtransPayment :source="source" v-if="is_midtrans_payment" @onClose="closeModal"></MidtransPayment>
+                     <DuitkuPayment :source="source" :payment_chanels="payment_chanels" v-if="is_duitku_payment" @onClose="closeModal"></DuitkuPayment>
 
                   </q-list>
                </div>
@@ -83,6 +83,12 @@ import MidtransPayment from './PaymentService/MidtransPayment.vue';
 import DuitkuPayment from './PaymentService/DuitkuPayment.vue';
 export default {
    components: { DirectPayment, TripayPayment, XenditPayment, MidtransPayment, DuitkuPayment },
+   props: {
+      source: {
+         type: String,
+         default: 'cart'
+      }
+   },
    data() {
       return {
          payment_chanels: [],
@@ -119,7 +125,7 @@ export default {
          return false
       },
       cart_order_form() {
-         return this.$store.getters["cart/getChartOrderForm"];
+         return this.$store.getters[`${this.source}/getChartOrderForm`];
       },
       user() {
          return this.$store.state.user.user
@@ -159,6 +165,11 @@ export default {
             this.direct_payments = res.data.data
          })
       },
+   },
+   watch: {
+      'cart_order_form.grand_total'() {
+         this.getPaymentChanel()
+      }
    },
    mounted() {
       this.getDirectPayments()

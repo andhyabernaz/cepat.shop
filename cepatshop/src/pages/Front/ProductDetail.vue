@@ -783,7 +783,23 @@ export default {
       addToCart() {
          this.formCartModal = false
 
-         let cartItem = {
+         let cartItem = this.buildCheckoutItem()
+
+         this.$store.dispatch('cart/addToCart', cartItem)
+
+         this.quantity = 1
+      },
+      addToDirectCheckout() {
+         this.formCartModal = false
+
+         let checkoutItem = this.buildCheckoutItem()
+
+         this.$store.dispatch('directCheckout/addItem', checkoutItem)
+
+         this.quantity = 1
+      },
+      buildCheckoutItem() {
+         return {
             session_id: this.session_id,
             product_id: this.product.id,
             product_stock: this.currentStock,
@@ -798,10 +814,6 @@ export default {
             product_type: this.product.product_type,
             affiliate_code: this.getAffiliateCode(),
          }
-
-         this.$store.dispatch('cart/addToCart', cartItem)
-
-         this.quantity = 1
       },
       showNotifyHasSelectVarian() {
          if (this.formCartModal) {
@@ -816,10 +828,8 @@ export default {
       buyNow() {
          this.quantity = 1
          this.nextToCart = true
-         
+
          this.processItem()
-         
-         
       },
       addNewItem() {
          this.nextToCart = false
@@ -848,11 +858,11 @@ export default {
             return
          }
 
-         this.addToCart()
-
          if(this.nextToCart) {
-            this.$router.push({ name: 'Cart' })
+            this.addToDirectCheckout()
+            this.$router.push({ name: 'DirectCheckout' })
          }else {
+            this.addToCart()
 
             this.cartModal = true
          }

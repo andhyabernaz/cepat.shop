@@ -117,9 +117,17 @@ class ApiResponse
 
    private static function send($data)
    {
-      if (self::$event) {
-         $data['event'] = self::$event;
+      $httpStatus = self::$http_status;
+      $event = self::$event;
+
+      if ($event) {
+         $data['event'] = $event;
       }
-      return response()->json($data, self::$http_status, [], JSON_UNESCAPED_UNICODE);
+
+      self::$http_status = null;
+      self::$event = null;
+      self::$message = null;
+
+      return response()->json($data, $httpStatus, [], JSON_UNESCAPED_UNICODE);
    }
 }

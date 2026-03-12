@@ -83,6 +83,12 @@
 <script>
 import { Api } from 'boot/axios'
 export default {
+   props: {
+      source: {
+         type: String,
+         default: 'cart'
+      }
+   },
    data() {
       return {
          modal: false,
@@ -94,7 +100,7 @@ export default {
          return this.$store.state.config
       },
       cart_order_form() {
-         return this.$store.getters['cart/getChartOrderForm']
+         return this.$store.getters[`${this.source}/getChartOrderForm`]
       },
       rendered_vouchers() {
          if (this.all_vouchers.length && this.cart_order_form) {
@@ -113,7 +119,7 @@ export default {
    methods: {
       selectVoucher(item) {
 
-         this.$store.commit('cart/TOGGLE_VOUCHER', item)
+         this.$store.commit(`${this.source}/TOGGLE_VOUCHER`, item)
          this.modal = false
 
       },

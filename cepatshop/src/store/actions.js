@@ -39,6 +39,7 @@ export default {
             let config = response.data.data
             commit('SET_CONFIG', config)
             commit('cart/SET_SERVICE_FEE', config, { root: true })
+            commit('directCheckout/SET_SERVICE_FEE', config, { root: true })
          }
       })
    },

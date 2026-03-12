@@ -30,14 +30,18 @@
 import { moneyFormat } from 'src/utils';
 export default {
    props: {
-      payment_chanels: Array
+      payment_chanels: Array,
+      source: {
+         type: String,
+         default: 'cart'
+      }
    },
    computed: {
       config() {
          return this.$store.state.config;
       },
       cart_order_form() {
-         return this.$store.getters["cart/getChartOrderForm"];
+         return this.$store.getters[`${this.source}/getChartOrderForm`];
       },
       user() {
          return this.$store.state.user.user
@@ -84,7 +88,7 @@ export default {
          return false;
       },
       selectPayment(item) {
-         this.$store.commit("cart/SET_PAYMENT", item);
+         this.$store.commit(`${this.source}/SET_PAYMENT`, item);
          this.$store.commit("CLEAR_ERRORS");
          this.$emit('onClose', 1)
       },

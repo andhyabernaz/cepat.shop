@@ -8,7 +8,7 @@ var ls = new SecureLS({ isCompression: false });
 
 const stateData = createPersistedState({
    key: '_cepatshop__state',
-   paths: ['user.user', 'user.token', 'user.permissions' ,'cart', 'shop', 'config', 'session_id', 'product.favorites', 'forgot_password', 'affiliate_config'],
+   paths: ['user.user', 'user.token', 'user.permissions' ,'cart', 'directCheckout', 'shop', 'config', 'session_id', 'product.favorites', 'forgot_password', 'affiliate_config'],
    storage: {
       getItem: (key) => ls.get(key),
       setItem: (key, value) => ls.set(key, value, { expires: 1 }),
@@ -30,6 +30,7 @@ import block from './block'
 import order from './order'
 import bank from './bank'
 import cart from './cart'
+import directCheckout from './directCheckout'
 import promo from './promo'
 import front from './front';
 import affiliate from './affiliate';
@@ -355,6 +356,7 @@ export default store(function (/* { ssrContext } */) {
          order,
          bank,
          cart,
+         directCheckout,
          promo,
          front,
          affiliate

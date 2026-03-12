@@ -65,5 +65,7 @@ Jika via browser muncul error not found gunakan force refresh browser atau via H
 Jika versi sebelumnya <= 2.7.x, segera atur kembali pengaturan alamat gudang pengiriman dan pengiriman lokal
 .
 
+## Git Access Guard
+Panduan setup guard commit/push hanya untuk akun `andhyabernaz` ada di [docs/GIT_ACCESS_GUARD.md](docs/GIT_ACCESS_GUARD.md).
 
 
