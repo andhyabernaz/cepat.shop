@@ -49,11 +49,12 @@ class MediaService
       } else {
 
          $filepath = rtrim($path, '/') . '/' . uniqid('img__', true) . '_' . Str::random(8) . '.' . $this->extension;
+         $absolutePath = public_path($filepath);
 
          if ($this->extension == 'png') {
-            Image::read($file)->scale($this->width)->toPng()->save($filepath);
+            Image::read($file)->scale($this->width)->toPng()->save($absolutePath);
          } else {
-            Image::read($file)->scale($this->width)->toWebp()->save($filepath);
+            Image::read($file)->scale($this->width)->toWebp()->save($absolutePath);
          }
       }
 
@@ -76,7 +77,7 @@ class MediaService
 
       $filepath = rtrim($path, '/') . '/' . $filename;
 
-      Image::read($file)->toWebp()->save($filepath);
+      Image::read($file)->toWebp()->save(public_path($filepath));
 
       return [
          'filename' => $filename,

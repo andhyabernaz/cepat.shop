@@ -60,23 +60,33 @@ export default {
    },
    SET_CONFIG: (state, payload) => {
 
-      state.config = payload
+      state.config = payload || {}
 
-      setCssVar('brand', state.config.theme_color);
-      setCssVar('primary', state.config.primary_color);
-      setCssVar('secondary', state.config.secondary_color);
-      setCssVar('accent', state.config.accent_color);
+      const themeColor = state.config.theme_color || state.config.primary_color || '#1976D2'
+      const primaryColor = state.config.primary_color || themeColor
+      const secondaryColor = state.config.secondary_color || '#26A69A'
+      const accentColor = state.config.accent_color || '#9C27B0'
 
-      AddressbarColor.set(state.config.theme_color)
+      setCssVar('brand', themeColor)
+      setCssVar('primary', primaryColor)
+      setCssVar('secondary', secondaryColor)
+      setCssVar('accent', accentColor)
+
+      AddressbarColor.set(themeColor)
 
    },
    SET_CURRENT_THEME: (state) => {
-      setCssVar('brand', state.config.theme_color);
-      setCssVar('primary', state.config.primary_color);
-      setCssVar('secondary', state.config.secondary_color);
-      setCssVar('accent', state.config.accent_color);
+      const themeColor = state.config?.theme_color || state.config?.primary_color || '#1976D2'
+      const primaryColor = state.config?.primary_color || themeColor
+      const secondaryColor = state.config?.secondary_color || '#26A69A'
+      const accentColor = state.config?.accent_color || '#9C27B0'
 
-      AddressbarColor.set(state.config.theme_color)
+      setCssVar('brand', themeColor)
+      setCssVar('primary', primaryColor)
+      setCssVar('secondary', secondaryColor)
+      setCssVar('accent', accentColor)
+
+      AddressbarColor.set(themeColor)
    },
    SET_HOME_VIEW_MODE: (state, payload) => {
       state.config.home_view_mode = payload

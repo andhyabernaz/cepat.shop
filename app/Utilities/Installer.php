@@ -115,8 +115,10 @@ class Installer
          $requirements[] = trans('install.requirements.directory', ['directory' => 'storage/logs']);
       }
 
-      if (Console::run('help') !== true) {
-         $requirements[] = trans('install.error.php_version', ['php_version' => '8.2']);
+      if (function_exists('proc_open')) {
+         if (Console::run('help') !== true) {
+            $requirements[] = trans('install.requirements.executable', ['php_version' => '8.1']);
+         }
       }
 
       return $requirements;

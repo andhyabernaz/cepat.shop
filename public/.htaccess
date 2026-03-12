@@ -20,10 +20,6 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-<IfModule mod_security.c>
-    SecRuleEngine Off
-</IfModule>
-
 # ============================================================
 # PERFORMANCE OPTIMIZATIONS
 # ============================================================
@@ -126,5 +122,4 @@
 <IfModule mod_headers.c>
     Header set Connection keep-alive
 </IfModule>
-
 

@@ -111,6 +111,8 @@ Jalankan perintah berikut di **command prompt lokal** sebelum upload:
 # 1. Install dependencies production only
 composer install --optimize-autoloader --no-dev
 
+# Catatan: aplikasi tetap bisa berjalan tanpa paket dev. Debugbar hanya aktif jika APP_DEBUG=true dan paketnya terpasang.
+
 # 2. Clear semua cache
 php artisan cache:clear
 php artisan config:clear
@@ -267,6 +269,14 @@ Letakkan **seluruh proyek** di dalam `public_html/` dan gunakan `.htaccess` root
 
 ---
 
+### Metode C: Deploy Otomatis via cPanel Git (Opsional)
+
+Jika hosting Anda menyediakan fitur **Git Version Control** (dengan deployment), repository ini sudah menyiapkan file [.cpanel.yml](file:///c:/xampp/htdocs/cepat/.cpanel.yml) sebagai contoh task deploy.
+
+Catatan:
+- Path deploy default diarahkan ke `$HOME/public_html/` dan perlu Anda sesuaikan jika document root berbeda.
+- File `.env` sengaja tidak ikut dicopy agar konfigurasi production tidak tertimpa saat deploy.
+
 ## 4. 🗄️ Membuat Database di cPanel
 
 ### 4.1 Buat Database Baru
@@ -412,13 +422,16 @@ FORCE_USER_DELETE=false
 |-----------------|----------------------------------------|--------------------------------|
 | `APP_ENV`       | `local`                               | `production`                   |
 | `APP_DEBUG`     | `true`                                 | `false`                        |
-| `APP_URL`       | `http://localhost/cepat.shop`          | `https://namadomainanda.com`   |
-| `ASSET_URL`     | `http://localhost/cepat.shop`          | `https://namadomainanda.com`   |
+| `APP_URL`       | `http://localhost/cepat`               | `https://namadomainanda.com`   |
+| `ASSET_URL`     | `http://localhost/cepat`               | `https://namadomainanda.com`   |
 | `DB_HOST`       | `127.0.0.1`                            | `localhost`                    |
 | `DB_DATABASE`   | `cepatshop`                            | `username_cepatshop`           |
 | `DB_USERNAME`   | `root`                                 | `username_cepatshop`           |
 | `DB_PASSWORD`   | *(kosong)*                             | `password_database_anda`       |
 | `LOG_LEVEL`     | `debug`                                | `error`                        |
+
+> [!TIP]
+> Jika aplikasi dipasang di subfolder (contoh `https://namadomainanda.com/cepat`), set `APP_URL` dan `ASSET_URL` ke URL lengkap tersebut (termasuk path `/cepat`).
 
 > [!CAUTION]
 > **`APP_DEBUG=true` di production adalah RISIKO KEAMANAN BESAR!** Informasi sensitif seperti password database, API keys, dan stack traces bisa terekspos ke pengunjung.
@@ -482,11 +495,10 @@ File ini **sudah benar** dan tidak perlu diubah:
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
-
-<IfModule mod_security.c>
-    SecRuleEngine Off
-</IfModule>
 ```
+
+> [!NOTE]
+> Di shared hosting, umumnya tidak bisa mematikan WAF/mod_security via `.htaccess`. Jika ada request yang diblokir, minta provider untuk whitelist/disable rule yang terkait.
 
 ### 7.4 Tambahan: Paksa HTTPS (Opsional tapi Direkomendasikan)
 
@@ -525,10 +537,6 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
-</IfModule>
-
-<IfModule mod_security.c>
-    SecRuleEngine Off
 </IfModule>
 ```
 
@@ -729,7 +737,7 @@ Periksa file log di `storage/logs/laravel.log`:
 | 5 | Ekstensi PHP tidak aktif | Aktifkan ekstensi yang diperlukan (lihat Bagian 1) |
 | 6 | `vendor/` tidak ada | Upload folder `vendor/` atau jalankan `composer install` |
 | 7 | `.htaccess` bermasalah | Pastikan `mod_rewrite` aktif di server |
-| 8 | `mod_security` memblokir | Tambahkan `SecRuleEngine Off` di `.htaccess` |
+| 8 | WAF / mod_security memblokir request | Minta provider hosting whitelist/disable rule yang memblokir (umumnya tidak bisa dimatikan via `.htaccess` di shared hosting) |
 
 **Cara Debug:**
 ```bash

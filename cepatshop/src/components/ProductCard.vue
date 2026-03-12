@@ -45,6 +45,7 @@
 </template>
 <script>
 import FavoriteButton from 'components/FavoriteButton.vue'
+import { Api } from 'boot/axios'
 export default {
    name: 'ProductCard',
    props: {
@@ -125,6 +126,14 @@ export default {
    methods: {
       show(slug) {
          if (this.grabbing) return
+         Api.post('product-click', {
+            product_id: this.product?.id ?? null,
+            product_slug: this.product?.slug ?? slug ?? null,
+            category_id: this.product?.category?.id ?? null,
+            category_slug: this.product?.category?.slug ?? null,
+            source: `product_card:${this.$route?.name ?? 'unknown'}`,
+            referrer: document.referrer || null,
+         }).catch(() => { })
          this.$router.push({ name: 'ProductShow', params: { slug: slug } })
       },
    }

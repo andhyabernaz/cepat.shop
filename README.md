@@ -9,7 +9,7 @@ Source code aplikasi toko online SPA dan PWA Ready
 ### SYSTEM REQUIREMENTS
 
 - Apache / nginx Server
-- PHP 8.2
+- PHP 8.1+
 - BCMath PHP Extension
 - Ctype PHP Extension
 - Fileinfo PHP Extension
@@ -64,7 +64,6 @@ Jika via browser muncul error not found gunakan force refresh browser atau via H
 ### Penting!!
 Jika versi sebelumnya <= 2.7.x, segera atur kembali pengaturan alamat gudang pengiriman dan pengiriman lokal
 .
-
 
 
 

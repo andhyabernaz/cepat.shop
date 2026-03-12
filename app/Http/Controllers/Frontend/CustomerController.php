@@ -174,7 +174,7 @@ class CustomerController extends Controller
 
          $filename = "upload/payments/" . uniqid('payment_') . $order->order_ref . '.webp';
 
-         Image::read($request->file('image'))->scale(400)->toWebp()->save($filename);
+         Image::read($request->file('image'))->scale(400)->toWebp()->save(public_path($filename));
 
          $transaction = $order->transaction;
 

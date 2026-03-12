@@ -8,6 +8,7 @@ use App\Http\Controllers\Frontend\CustomerController;
 use App\Http\Controllers\Frontend\FrontApiController;
 use App\Http\Controllers\Frontend\FrontOrderController;
 use App\Http\Controllers\Frontend\FrontProductController;
+use App\Http\Controllers\Frontend\ProductClickController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\NotificationDispathEventController;
 use App\Http\Controllers\PaymentServiceController;
@@ -48,6 +49,7 @@ Route::get('getVoucherByCode/{voucher_code}', [FrontApiController::class, 'getVo
 Route::get('payment-chanels', [PaymentServiceController::class, 'paymentChanels']);
 
 Route::post('dispatchEvent', NotificationDispathEventController::class);
+Route::post('product-click', ProductClickController::class);
 
 Route::post('uploadPaymentProof/{order_id}', [CustomerController::class, 'uploadPaymentProof']);
 

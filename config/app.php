@@ -156,14 +156,14 @@ return [
     |
     */
 
-   'providers' => ServiceProvider::defaultProviders()->merge([
+   'providers' => ServiceProvider::defaultProviders()->merge(array_filter([
       /*
          * Package Service Providers...
          */
 
       Maatwebsite\Excel\ExcelServiceProvider::class,
       App\Providers\CepatshopServiceProvider::class,
-      Barryvdh\Debugbar\ServiceProvider::class,
+      (env('APP_DEBUG') && class_exists(Barryvdh\Debugbar\ServiceProvider::class)) ? Barryvdh\Debugbar\ServiceProvider::class : null,
 
       /*
          * Application Service Providers...
@@ -173,7 +173,7 @@ return [
       // App\Providers\BroadcastServiceProvider::class,
       App\Providers\EventServiceProvider::class,
       App\Providers\RouteServiceProvider::class,
-   ])->toArray(),
+   ]))->toArray(),
 
    /*
     |--------------------------------------------------------------------------

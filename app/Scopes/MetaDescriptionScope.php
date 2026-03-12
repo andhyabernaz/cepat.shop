@@ -1,6 +1,6 @@
 <?php
 
-namespace Silehage\Cepatshop\Scopes;
+namespace App\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +13,6 @@ class MetaDescriptionScope implements Scope
     */
    public function apply(Builder $builder, Model $model): void
    {
-      $builder->addSelectRaw("CONCAT(SUBSTRING(REGEXP_REPLACE(products.description, '<[^>]*>', ''), 1, 130),'...') AS short_description");
+      $builder->addSelectRaw("CONCAT(SUBSTRING(products.description, 1, 130),'...') AS short_description");
    }
 }

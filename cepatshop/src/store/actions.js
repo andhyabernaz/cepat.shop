@@ -26,7 +26,7 @@ export default {
       commit('SET_SESSION_ID', result);
    },
    getShop: ({ commit }) => {
-      Api.get('shop').then(response => {
+      Api.get('shop', { silent: true }).then(response => {
          if (response.status == 200) {
             commit('SET_SHOP', response.data.data.shop)
             commit('SET_CONFIG', response.data.data.config)
@@ -34,7 +34,7 @@ export default {
       })
    },
    getConfig: ({ commit }) => {
-      Api.get('config').then(response => {
+      Api.get('config', { silent: true }).then(response => {
          if (response.status == 200) {
             let config = response.data.data
             commit('SET_CONFIG', config)
@@ -45,17 +45,18 @@ export default {
    getInitialData: async ({ commit }) => {
       document.body.classList.add('is_loading')
       commit('SET_LOADING', true)
-      let response = await Api.get('getInitialData')
-      document.body.classList.remove('is_loading')
-      
-      if (response.status == 200) {
-         commit('SET_SHOP', response.data.data.shop)
-         commit('SET_CONFIG', response.data.data.config)
-         commit('front/SET_INITIAL_DATA', response.data.data, { root: true })
-         commit('SET_SESSION_ID', response.data.data.sess_id)
+      try {
+         let response = await Api.get('getInitialData', { silent: true })
+         if (response.status == 200) {
+            commit('SET_SHOP', response.data.data.shop)
+            commit('SET_CONFIG', response.data.data.config)
+            commit('front/SET_INITIAL_DATA', response.data.data, { root: true })
+            commit('SET_SESSION_ID', response.data.data.sess_id)
+         }
+      } finally {
+         document.body.classList.remove('is_loading')
+         commit('SET_LOADING', false)
       }
-
-      commit('SET_LOADING', false)
    },
    searchAddress({ }, keyword) {
       return Api.get('shipping/searchAddress?q=' + keyword)

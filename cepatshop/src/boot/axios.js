@@ -90,6 +90,10 @@ export default boot(({ app, router, store, urlPath }) => {
       var errors = []
       let showMessage = true
 
+      if (error?.config?.silent === true) {
+         return Promise.reject(error)
+      }
+
       if (error.response) {
 
          if (error.response.status == 503) {
@@ -128,8 +132,7 @@ export default boot(({ app, router, store, urlPath }) => {
 
          // Backend error
          if (500 === error.response.status) {
-            // errors = error.response.data.message
-            errors.push(error.response.data.message)
+            errors.push('Terjadi gangguan pada server, silahkan coba lagi.')
          }
          if (400 === error.response.status) {
             errors.push(error.response.data.message)
@@ -163,6 +166,10 @@ export default boot(({ app, router, store, urlPath }) => {
       store.commit('SET_LOADING', false)
       Loading.hide()
       var errors = []
+
+      if (error?.config?.silent === true) {
+         return Promise.reject(error)
+      }
 
       if (error.response.status == 503) {
 

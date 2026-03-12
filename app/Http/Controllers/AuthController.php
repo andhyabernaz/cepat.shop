@@ -2,104 +2,107 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Helpers\ApiResponse;
+use App\Jobs\DispatchNotificationJob;
+use App\Models\NotificationTemplate;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\NotificationTemplate;
 use Illuminate\Support\Facades\Hash;
-use App\Jobs\DispatchNotificationJob;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-   public function login(Request $request)
-   {
-      $request->validate([
-         'email' => 'required',
-         'password' => 'required',
-         'device_name' => 'required',
-      ], [
-         'email.required' => 'Email atau No ponsel wajib diisi.',
-         'password.required' => 'Password wajib diisi.',
-      ]);
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required',
+            'device_name' => 'required',
+        ], [
+            'email.required' => 'Email atau No ponsel wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+        ]);
 
-      $user = User::where('email', $request->email)->orWhere('phone', $request->email)->first();
+        $user = User::where('email', $request->email)->orWhere('phone', $request->email)->first();
 
-      if (!$user || !Hash::check($request->password, $user->password)) {
-         throw ValidationException::withMessages([
-            'email' => ['Data kredensial salah.'],
-         ]);
-      }
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Data kredensial salah.'],
+            ]);
+        }
 
-      DB::table('personal_access_tokens')->where('last_used_at', '<', now()->subMonths(3))->delete();
+        DB::table('personal_access_tokens')->where('last_used_at', '<', now()->subMonths(3))->delete();
 
-      $token = $user->createToken($request->device_name)->plainTextToken;
+        $token = $user->createToken($request->device_name)->plainTextToken;
 
-      $data = [
-         'token' => $token,
-         'user' => $user->load('address')
-      ];
-      return ApiResponse::success($data);
-   }
+        $data = [
+            'token' => $token,
+            'user' => $user->load('address'),
+        ];
 
-   public function register(Request $request)
-   {
-      $request->validate([
-         'name' => ['required', 'string', 'max:60'],
-         'phone' => ['required', 'string', 'max:20', 'unique:users'],
-         'email' => ['required', 'string', 'email', 'max:80', 'unique:users'],
-         'password' => ['required', 'confirmed'],
-      ], [
-         'name.required' => 'Nama wajib diisi.',
-         'phone.required' => 'Nomor ponsel wajib diisi.',
-         'phone.unique' => 'Nomor ponsel sudah terdaftar.',
-         'email.unique' => 'Email sudah terdaftar.',
-         'password.confirmed' => 'Password konfirmasi tidak sama.',
-      ]);
+        return ApiResponse::success($data);
+    }
 
-      $user = User::create([
-         'name' => $request->name,
-         'email' => $request->email,
-         'phone' => $request->phone,
-         'password' => Hash::make($request->password),
-      ]);
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:60'],
+            'phone' => ['required', 'string', 'max:20', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:80', 'unique:users'],
+            'password' => ['required', 'confirmed'],
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'phone.required' => 'Nomor ponsel wajib diisi.',
+            'phone.unique' => 'Nomor ponsel sudah terdaftar.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.confirmed' => 'Password konfirmasi tidak sama.',
+        ]);
 
-      $token = $user->createToken($request->device_name)->plainTextToken;
-      $event = NotificationTemplate::USER_REGISTRATION;
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+        ]);
 
-      DispatchNotificationJob::dispatch($event, $user);
+        $token = $user->createToken($request->device_name)->plainTextToken;
+        $event = NotificationTemplate::USER_REGISTRATION;
 
-      $data = [
-         'token' => $token,
-         'user' => $user->load('address')
-      ];
-      return ApiResponse::withEvent($event)->success($data);
-   }
+        DispatchNotificationJob::dispatch($event, $user);
 
-   public function logout()
-   {
-      $user = auth('sanctum')->user();
-      if ($user) {
-         $user->currentAccessToken()->delete();
-      }
+        $data = [
+            'token' => $token,
+            'user' => $user->load('address'),
+        ];
 
-      return ApiResponse::success();
-   }
-   public function validationToken()
-   {
-      $user = auth('sanctum')->user();
+        return ApiResponse::withEvent($event)->success($data);
+    }
 
-      $is_valid = false;
+    public function logout()
+    {
+        $user = auth('sanctum')->user();
+        if ($user) {
+            $user->currentAccessToken()->delete();
+        }
 
-      if ($user) {
-         $is_valid = true;
-         $user->load('address');
-      }
+        return ApiResponse::success();
+    }
 
-      return ApiResponse::success([
-         'is_valid' => $is_valid,
-         'user' => $user
-      ]);
-   }
+    public function validationToken()
+    {
+        $user = auth('sanctum')->user();
+
+        $is_valid = false;
+
+        if ($user) {
+            $is_valid = true;
+            $user->load('address');
+        }
+
+        return ApiResponse::success([
+            'is_valid' => $is_valid,
+            'user' => $user,
+        ]);
+    }
 }

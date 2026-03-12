@@ -139,13 +139,18 @@ export function resetPassword({ }, payload) {
 }
 
 export function validationToken({ commit }) {
-   BaseApi.get('auth/validationToken').then(res => {
-      commit('SET_HAS_VALIDATION_TOKEN', null ,{ root: true })
-      if (res.data.data.is_valid) {
-         commit('SET_USER', res.data.data.user)
-      } else {
+   return BaseApi.get('auth/validationToken', { silent: true })
+      .then(res => {
+         if (res?.data?.data?.is_valid) {
+            commit('SET_USER', res.data.data.user)
+         } else {
+            commit('LOGOUT')
+         }
+      })
+      .catch(() => {
          commit('LOGOUT')
-      }
-   })
+      })
+      .finally(() => {
+         commit('SET_HAS_VALIDATION_TOKEN', null, { root: true })
+      })
 }
-
