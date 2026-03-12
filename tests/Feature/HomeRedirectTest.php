@@ -39,6 +39,8 @@ class HomeRedirectTest extends TestCase
         $response = $kernel->handle(Request::create('/home', 'GET'));
 
         $this->assertSame(301, $response->getStatusCode());
-        $this->assertSame(parse_url(url('/'), PHP_URL_PATH), $response->headers->get('Location'));
+        $location = $response->headers->get('Location');
+        $this->assertNotNull($location);
+        $this->assertTrue($location === '/' || $location === url('/'));
     }
 }

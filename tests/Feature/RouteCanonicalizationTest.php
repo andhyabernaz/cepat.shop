@@ -17,9 +17,18 @@ class RouteCanonicalizationTest extends TestCase
         $this->assertStringEndsWith('/expected', $generated);
     }
 
-    public function test_auto_cepat_path_is_not_served_by_laravel(): void
+    public function test_auto_cepat_path_is_redirected_to_main_domain(): void
     {
-        $this->get('http://localhost/auto/cepat')->assertNotFound();
-        $this->get('http://localhost/auto/cepat/anything')->assertNotFound();
+        $this->get('http://localhost/auto/cepat')
+            ->assertRedirect('https://shop.cepat.digital/');
+
+        $this->get('http://localhost/auto/cepat/anything')
+            ->assertRedirect('https://shop.cepat.digital/anything');
+    }
+
+    public function test_auto_path_is_redirected_to_main_domain_with_query(): void
+    {
+        $this->get('http://localhost/auto/sample?foo=bar')
+            ->assertRedirect('https://shop.cepat.digital/sample?foo=bar');
     }
 }

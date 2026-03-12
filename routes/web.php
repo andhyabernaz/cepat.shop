@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\Installed;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\Frontend\FrontController;
@@ -19,16 +20,42 @@ use App\Http\Controllers\Install\InstallController;
 
 // MOHON UNTUK TIDAK MENGEDIT ROUTE DIBAWAH
 Route::get('/install', [InstallController::class, 'index'])->name('install');
-Route::any('/auto/cepat', function () {
-   abort(404);
+Route::any('/auto/cepat', function (Request $request) {
+   $target = 'https://shop.cepat.digital/';
+   $query = $request->getQueryString();
+   if ($query) {
+      $target .= '?' . $query;
+   }
+
+   return redirect()->away($target, 301);
 });
-Route::any('/auto/cepat/{any?}', function () {
-   abort(404);
+Route::any('/auto/cepat/{any?}', function (Request $request, ?string $any = null) {
+   $target = 'https://shop.cepat.digital/' . ltrim((string) $any, '/');
+   $query = $request->getQueryString();
+   if ($query) {
+      $target .= '?' . $query;
+   }
+
+   return redirect()->away($target, 301);
 })->where('any', '.*');
-Route::redirect('/auto', '/', 301);
+Route::any('/auto', function (Request $request) {
+   $target = 'https://shop.cepat.digital/';
+   $query = $request->getQueryString();
+   if ($query) {
+      $target .= '?' . $query;
+   }
+
+   return redirect()->away($target, 301);
+});
 Route::redirect('/home', '/', 301);
-Route::get('/auto/{any}', function (string $any) {
-   return redirect("/{$any}", 301);
+Route::any('/auto/{any}', function (Request $request, string $any) {
+   $target = 'https://shop.cepat.digital/' . ltrim($any, '/');
+   $query = $request->getQueryString();
+   if ($query) {
+      $target .= '?' . $query;
+   }
+
+   return redirect()->away($target, 301);
 })->where('any', '.*');
 Route::middleware([Installed::class])->group(
    function () {
