@@ -1,6 +1,13 @@
 <template>
    <q-scroll-area class="fit sidebar cs-sidebar" :class="{ 'cs-sidebar--dark': is_dark, 'cs-sidebar--light': !is_dark }">
       <q-list :dark="is_dark" class="q-pb-lg">
+         <div class="q-px-md q-pt-md q-pb-sm flex" :class="is_mini ? 'justify-center' : 'justify-start'">
+            <AdminBrandLockup
+               :compact="is_mini"
+               :dark="is_dark"
+               loading="lazy"
+            />
+         </div>
          <div :class="is_mini ? 'q-py-xs' : 'q-py-lg'" >
 
             <q-item>
@@ -51,8 +58,10 @@
 </template>
 
 <script>
+import AdminBrandLockup from './AdminBrandLockup.vue'
 
 export default {
+   components: { AdminBrandLockup },
    watch: {
       is_dark() {
          this.handleDarkMode()

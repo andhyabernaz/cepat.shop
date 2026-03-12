@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\Review;
+use App\Models\User;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -85,8 +88,68 @@ class DashboardController extends Controller
       return ApiResponse::success([
          'latest_orders' => $latest_orders,
          'order_reports' => $order_reports[0],
-         'transaction_reports' => $this->_transactionReports($request)
+         'transaction_reports' => $this->_transactionReports($request),
+         'landing_stats' => $this->landingStats(),
+         'testimonials' => $this->testimonials(),
       ]);
+   }
+
+   protected function landingStats()
+   {
+      return [
+         [
+            'label' => 'Pelanggan',
+            'value' => User::query()->whereNull('role_id')->count(),
+            'icon' => 'groups',
+            'accent' => 'primary',
+            'description' => 'Akun customer yang siap ditargetkan lewat landing page.',
+         ],
+         [
+            'label' => 'Produk Aktif',
+            'value' => Product::query()->where('status', 1)->count(),
+            'icon' => 'inventory_2',
+            'accent' => 'teal',
+            'description' => 'Katalog aktif yang bisa dipromosikan dari hero sampai CTA.',
+         ],
+         [
+            'label' => 'Ulasan Tayang',
+            'value' => Review::query()->approved()->count(),
+            'icon' => 'reviews',
+            'accent' => 'amber-8',
+            'description' => 'Social proof yang bisa dipakai kembali untuk blok testimoni.',
+         ],
+         [
+            'label' => 'Order Selesai',
+            'value' => Order::query()->where('order_status', Order::COMPLETE)->count(),
+            'icon' => 'task_alt',
+            'accent' => 'positive',
+            'description' => 'Pesanan yang sudah selesai dan siap jadi bukti performa.',
+         ],
+      ];
+   }
+
+   protected function testimonials()
+   {
+      return Review::query()
+         ->approved()
+         ->with('product:id,title,slug')
+         ->latest()
+         ->limit(6)
+         ->get()
+         ->map(function ($review) {
+            $comment = trim(strip_tags((string) $review->comment));
+
+            return [
+               'id' => $review->id,
+               'name' => $review->name ?: 'Pelanggan',
+               'comment' => $comment,
+               'rating' => intval($review->rating ?? 5),
+               'product_name' => $review->product_name ?: optional($review->product)->title ?: 'Produk',
+               'product_slug' => optional($review->product)->slug,
+               'created' => $review->created,
+            ];
+         })
+         ->values();
    }
 
    protected function _transactionReports($request)
