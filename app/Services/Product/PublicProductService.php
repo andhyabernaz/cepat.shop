@@ -284,6 +284,11 @@ class PublicProductService
             $promo->end_date = $item->end_date;
 
             $promo->products = $item->products->map(function ($product) {
+               $totalStock = is_null($product->total_stock) ? $product->stock : $product->total_stock;
+
+               if ($product->is_unlimited_stock) {
+                  $totalStock = null;
+               }
 
                return [
                   'id'      => $product->id,
@@ -294,7 +299,7 @@ class PublicProductService
                   'pricing' =>  $this->setPricing($product),
                   'assets'  =>  $product->assets,
                   'sold' => $product->sold > 0 ? shortNumberPlus($product->sold) . ' terjual' : 0,
-                  'total_stock' => is_null($product->total_stock) ? $product->stock : $product->total_stock,
+                  'total_stock' => $totalStock,
                   'is_unlimited_stock' => $product->is_unlimited_stock
                ];
             });

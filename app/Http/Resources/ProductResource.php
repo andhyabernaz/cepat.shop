@@ -46,7 +46,7 @@ class ProductResource extends JsonResource
          'slug' => $this->slug,
          'description' => mb_convert_encoding($this->description, "UTF-8", "auto"),
          'sku' => $this->sku,
-         'stock' => intval($this->stock),
+         'stock' => $this->is_unlimited_stock ? null : intval($this->stock),
          'rating' => $this->reviews_avg_rating ? number_format($this->reviews_avg_rating, 1) : 0,
          'weight' => intval($this->weight),
          'assets' => $this->assets,
@@ -56,6 +56,7 @@ class ProductResource extends JsonResource
          'product_type' => $this->product_type,
          'sold' => $this->sold > 0 ? shortNumberPlus($this->sold) . ' terjual' : 0,
          'is_default_type' => $this->is_default_type,
+         'is_unlimited_stock' => $this->is_unlimited_stock,
       ];
    }
 }

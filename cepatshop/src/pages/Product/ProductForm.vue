@@ -71,7 +71,7 @@
                      <money-formatter required outlined v-model="form.price" prefix="Rp" stack-label />
                   </div>
                   <div class="col">
-                     <money-formatter required outlined v-model="form.stock" label="Stok" stack-label/>
+                     <StockField v-model="form.stock" label="Stok" outlined stack-label />
                   </div>
                   <div class="col" v-if="!is_product_digital">
                      <q-input type="number" min="50" required outlined v-model="form.weight" label="Berat" stack-label
@@ -288,9 +288,10 @@ import VarianFormModal from './VarianFormModal.vue'
 import ContentEditor from 'components/ContentEditor.vue'
 import CategoryBlock from './CategoryBlock.vue'
 import MediaBlock from './MediaBlock.vue'
+import StockField from './StockField.vue'
 import { BaseApi } from 'src/boot/axios'
 export default {
-   components: { ContentEditor, MediaBlock, CategoryBlock, VarianFormModal },
+   components: { ContentEditor, MediaBlock, CategoryBlock, VarianFormModal, StockField },
    name: 'ProductFormCreate',
    data() {
       return {
@@ -303,7 +304,7 @@ export default {
             title: '',
             price: 0,
             weight: 0,
-            stock: 0,
+            stock: null,
             description: '',
             category_id: '',
             varians: [],
@@ -432,7 +433,13 @@ export default {
       pushSubVarian(varIndex) {
          let varian = this.form.varians[varIndex]
 
-         let tpl = { label: varian.subvarian[0].label, value: '', stock: 0, price: varian.price ?? 0, weight: varian.weight ?? 0 }
+         let tpl = {
+            label: varian.subvarian[0].label,
+            value: '',
+            stock: this.getVariantDefaultStock(varian.subvarian[0].stock),
+            price: varian.price ?? 0,
+            weight: varian.weight ?? 0
+         }
 
          this.form.varians[varIndex].subvarian.push(tpl)
 
@@ -447,7 +454,14 @@ export default {
          }, 500)
       },
       pushVarian() {
-         this.form.varians.push({ has_subvarian: false, label: this.form.varians[0].label, value: '', stock: 0, price: this.form.price ?? 0, weight: this.form.weight ?? 0 })
+         this.form.varians.push({
+            has_subvarian: false,
+            label: this.form.varians[0].label,
+            value: '',
+            stock: this.getVariantDefaultStock(),
+            price: this.form.price ?? 0,
+            weight: this.form.weight ?? 0
+         })
 
          setTimeout(() => {
             let col = document.querySelectorAll('.single-varian')
@@ -462,7 +476,7 @@ export default {
       addVarianProduk(data) {
          let defaultPrice = this.form.price ?? 0;
          let weight = this.form.weight ?? 0;
-         let stock = this.form.stock ?? 0;
+         let stock = this.getVariantDefaultStock();
 
          if (this.form.has_subvarian) {
 
@@ -506,7 +520,7 @@ export default {
                let sub = {
                   label: el.label,
                   value: el.value,
-                  stock: el.stock,
+                  stock: this.getVariantDefaultStock(el.stock),
                   price: el.price,
                   weight: el.weight
                }
@@ -518,7 +532,7 @@ export default {
                has_subvarian: false,
                label: varian.label,
                value: '',
-               stock: varian.stock,
+               stock: this.getVariantDefaultStock(varian.stock),
                price: varian.price,
                weight: varian.weight
             }
@@ -546,6 +560,53 @@ export default {
             block: 'center'
          })
       },
+      getVariantDefaultStock(source = this.form.stock) {
+         const parsed = Number.parseInt(source, 10)
+         return Number.isInteger(parsed) && parsed > 0 ? parsed : 1
+      },
+      isPositiveStock(value) {
+         const parsed = Number.parseInt(value, 10)
+         return Number.isInteger(parsed) && parsed > 0
+      },
+      validateStockFields() {
+         if (this.form.simple_product) {
+            if (this.form.stock !== null && !this.isPositiveStock(this.form.stock)) {
+               this.$q.notify({
+                  type: 'negative',
+                  message: 'Stok terbatas harus berupa bilangan bulat positif'
+               })
+               return false
+            }
+
+            return true
+         }
+
+         for (const varian of this.form.varians) {
+            if (varian.has_subvarian && Array.isArray(varian.subvarian)) {
+               for (const item of varian.subvarian) {
+                  if (!this.isPositiveStock(item.stock)) {
+                     this.$q.notify({
+                        type: 'negative',
+                        message: 'Stok setiap subvarian harus berupa bilangan bulat positif'
+                     })
+                     return false
+                  }
+               }
+
+               continue
+            }
+
+            if (!this.isPositiveStock(varian.stock)) {
+               this.$q.notify({
+                  type: 'negative',
+                  message: 'Stok setiap varian harus berupa bilangan bulat positif'
+               })
+               return false
+            }
+         }
+
+         return true
+      },
       submit() {
          if (!this.form.description) {
 
@@ -562,6 +623,10 @@ export default {
                type: 'negative',
                message: 'produk varian tidak boleh kosong'
             })
+            return
+         }
+
+         if (!this.validateStockFields()) {
             return
          }
 
@@ -584,6 +649,9 @@ export default {
       },
       setData(data) {
          this.form = { ...this.form, ...data }
+         if (data.is_unlimited_stock || Number(data.stock) < 0) {
+            this.form.stock = null
+         }
          this.form.has_subvarian = data.varians.length ? data.varians[0].has_subvarian : false
          this.form.simple_product = !data.varians.length
 

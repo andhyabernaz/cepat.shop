@@ -64,12 +64,12 @@
                         </td>
                         <td>
                            <div v-if="product.total_count > 0">
-                              <q-item-label> {{ numberFormat(product.total_stock) }}</q-item-label>
+                              <q-item-label>{{ renderTotalStock(product) }}</q-item-label>
                               <q-item-label caption>{{ product.total_count }}
                                  varian</q-item-label>
                            </div>
                            <div v-else>
-                              {{ product.stock < 0 ? 'Unlimited' : numberFormat(product.stock) }} </div>
+                              {{ renderStockValue(product.stock, product.is_unlimited_stock) }}</div>
                         </td>
 
                         <td>{{ product.affiliate_detail }}</td>
@@ -133,7 +133,7 @@
                                  {{ varian.product_name }}
                               </q-item-label>
                            </td>
-                           <td>{{ varian.stock }}</td>
+                           <td>{{ renderStockValue(varian.stock, varian.stock === null) }}</td>
                            <td>{{ moneyIdr(parseInt(varian.price)) }}</td>
                         </tr>
                      </tbody>
@@ -282,6 +282,16 @@ export default {
          }
 
          return "";
+      },
+      renderStockValue(stock, isUnlimited = false) {
+         if (isUnlimited || stock === null || Number(stock) < 0) {
+            return 'Unlimited'
+         }
+
+         return this.numberFormat(stock)
+      },
+      renderTotalStock(product) {
+         return this.renderStockValue(product.total_stock, product.is_unlimited_stock)
       },
       searchProduct() {
          if (

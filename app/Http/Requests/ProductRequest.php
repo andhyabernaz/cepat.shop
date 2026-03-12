@@ -22,6 +22,10 @@ class ProductRequest extends FormRequest
          'description' => 'required',
          'aff_amount' => 'numeric',
          'assets' => ['required', 'array'],
+         'varians' => ['nullable', 'array'],
+         'varians.*.stock' => ['nullable', 'integer', 'min:1'],
+         'varians.*.subvarian' => ['nullable', 'array'],
+         'varians.*.subvarian.*.stock' => ['nullable', 'integer', 'min:1'],
       ];
 
       if ($this->product_type == ProductTypeEnum::DigitalVideo->value) {
@@ -30,6 +34,9 @@ class ProductRequest extends FormRequest
       if ($this->product_type == ProductTypeEnum::DigitalDownload->value) {
          $rules['digital_downloads'] = ['required', 'array'];
       }
+      if ($this->boolean('simple_product')) {
+         $rules['stock'] = ['nullable', 'integer', 'min:1'];
+      }
 
       return $rules;
    }
@@ -37,7 +44,10 @@ class ProductRequest extends FormRequest
    public function messages()
    {
       return [
-         'title.unique' => 'Nama produk sudah digunakan'
+         'title.unique' => 'Nama produk sudah digunakan',
+         'stock.min' => 'Stok harus berupa bilangan bulat positif.',
+         'varians.*.stock.min' => 'Stok varian harus berupa bilangan bulat positif.',
+         'varians.*.subvarian.*.stock.min' => 'Stok subvarian harus berupa bilangan bulat positif.',
       ];
    }
 

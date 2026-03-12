@@ -35,6 +35,8 @@ class Product extends Model
       'aff_is_percentage' => 'boolean',
       'category_id' => 'integer',
       'price' => 'integer',
+      'stock' => 'integer',
+      'weight' => 'integer',
    ];
 
    public $appends = [
@@ -84,7 +86,12 @@ class Product extends Model
       if (in_array($this->product_type, [ProductTypeEnum::DigitalDownload->value, ProductTypeEnum::DigitalVideo->value])) {
          return true;
       }
-      return false;
+
+      if (is_null($this->stock)) {
+         return true;
+      }
+
+      return intval($this->stock) < 0;
    }
     public function leads()
    {

@@ -15,6 +15,11 @@ class ProductListResource extends JsonResource
    public function toArray($request)
    {
       // return parent::toArray($request);
+      $totalStock = is_null($this->total_stock) ? $this->stock : $this->total_stock;
+
+      if ($this->is_unlimited_stock) {
+         $totalStock = null;
+      }
 
       $pricing = [
          'default_price' => $this->price,
@@ -50,7 +55,7 @@ class ProductListResource extends JsonResource
          'short_description' => mb_convert_encoding($this->short_description, "UTF-8", "auto"),
          'product_type' => $this->product_type,
          'sold' => $this->sold > 0 ? shortNumberPlus($this->sold) . ' terjual' : 0,
-         'total_stock' => is_null($this->total_stock) ? $this->stock : $this->total_stock,
+         'total_stock' => is_null($totalStock) ? null : (int) $totalStock,
          'is_unlimited_stock' => $this->is_unlimited_stock,
       ];
    }

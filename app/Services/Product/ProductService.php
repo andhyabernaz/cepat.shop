@@ -108,13 +108,13 @@ class ProductService
          $is_simple_product = $request->boolean('simple_product');
 
          $product_type = $request->product_type;
-         $defaultPrice = $request->price ?? 0;
-         $defaultStock =  $request->stock ?? 0;
-         $defaultWeight = $request->weight ?? 1;
+         $defaultPrice = $this->normalizeMoneyValue($request->price);
+         $defaultStock = $this->normalizeStockValue($request->input('stock'));
+         $defaultWeight = $this->normalizeMoneyValue($request->weight, 1);
 
          if (ProductTypeEnum::DigitalDownload->value == $product_type || ProductTypeEnum::DigitalVideo->value == $product_type) {
             $is_simple_product = true;
-            $defaultStock = -1;
+            $defaultStock = null;
             $defaultWeight = 1;
          }
 
@@ -196,15 +196,17 @@ class ProductService
 
                   foreach ($data['subvarian'] as $item) {
                      $item['product_id'] = $product->id;
-                     $item['price'] = str_replace(".", "", $item['price']);
-                     $item['weight'] = str_replace(".", "", $item['weight']);
+                     $item['price'] = $this->normalizeMoneyValue($item['price'] ?? 0);
+                     $item['weight'] = $this->normalizeMoneyValue($item['weight'] ?? 0);
+                     $item['stock'] = $this->normalizeStockValue($item['stock'] ?? null);
 
                      $varian->subvarian()->create($item);
                   }
                } else {
 
-                  $data['price'] = str_replace(".", "", $data['price']);
-                  $data['weight'] = str_replace(".", "", $data['weight']);
+                  $data['price'] = $this->normalizeMoneyValue($data['price'] ?? 0);
+                  $data['weight'] = $this->normalizeMoneyValue($data['weight'] ?? 0);
+                  $data['stock'] = $this->normalizeStockValue($data['stock'] ?? null);
                   $product->varians()->create($data);
                }
             }
@@ -263,14 +265,14 @@ class ProductService
          $product_type = $request->product_type;
 
          $product_type = $request->product_type;
-         $defaultPrice = $request->price ?? 0;
-         $defaultStock =  $request->stock ?? 0;
-         $defaultWeight = $request->weight ?? 1;
+         $defaultPrice = $this->normalizeMoneyValue($request->price);
+         $defaultStock = $this->normalizeStockValue($request->input('stock'));
+         $defaultWeight = $this->normalizeMoneyValue($request->weight, 1);
 
          if (ProductTypeEnum::DigitalDownload->value == $product_type || ProductTypeEnum::DigitalVideo->value == $product_type) {
             $is_simple_product = true;
             $defaultWeight = 1;
-            $defaultStock = -1;
+            $defaultStock = null;
          }
 
 
@@ -392,8 +394,9 @@ class ProductService
                   foreach ($data['subvarian'] as $item) {
 
                      $item['product_id'] = $product->id;
-                     $item['price'] = str_replace(".", "", $item['price']);
-                     $item['weight'] = str_replace(".", "", $item['weight']);
+                     $item['price'] = $this->normalizeMoneyValue($item['price'] ?? 0);
+                     $item['weight'] = $this->normalizeMoneyValue($item['weight'] ?? 0);
+                     $item['stock'] = $this->normalizeStockValue($item['stock'] ?? null);
 
                      if (isset($item['id'])) {
 
@@ -406,8 +409,9 @@ class ProductService
                   }
                } else {
 
-                  $data['price'] = str_replace(".", "", $data['price']);
-                  $data['weight'] = str_replace(".", "", $data['weight']);
+                  $data['price'] = $this->normalizeMoneyValue($data['price'] ?? 0);
+                  $data['weight'] = $this->normalizeMoneyValue($data['weight'] ?? 0);
+                  $data['stock'] = $this->normalizeStockValue($data['stock'] ?? null);
 
                   if (isset($data['id'])) {
 
@@ -532,5 +536,23 @@ class ProductService
       Cache::forget('products');
       Cache::forget('initial_products');
       Cache::forget('product_promo');
+   }
+
+   protected function normalizeMoneyValue($value, $default = 0): int
+   {
+      if ($value === null || $value === '') {
+         return $default;
+      }
+
+      return (int) str_replace('.', '', (string) $value);
+   }
+
+   protected function normalizeStockValue($value): ?int
+   {
+      if ($value === null || $value === '') {
+         return null;
+      }
+
+      return (int) $value;
    }
 }

@@ -371,11 +371,7 @@
 
                <div style="min-height:21px" class="text-weight-medium">
 
-                  <div v-if="checkVarianIsReady()" :class="{
-                     'text-green': currentStock >= 5,
-                     'text-amber-10': currentStock < 5 && currentStock > 0,
-                     'text-red': currentStock < 1
-                  }">{{ currentStock > 0 ? `Tersedia ${currentStock} item` : 'Stok Habis' }}</div>
+                  <div v-if="checkVarianIsReady()" :class="stockAvailabilityClass">{{ stockAvailabilityText }}</div>
                </div>
 
             </q-card-section>
@@ -627,10 +623,18 @@ export default {
          if (this.has_varian && this.product_varian_selected) {
             return parseInt(this.product_varian_selected.stock)
          }
+
+         if (this.product.is_unlimited_stock) {
+            return null
+         }
+
          return parseInt(this.product.stock)
       },
+      isCurrentStockUnlimited() {
+         return !this.has_varian && this.product.is_unlimited_stock
+      },
       currentStock() {
-         if (this.product.is_unlimited_stock) {
+         if (this.isCurrentStockUnlimited) {
             return 9999999
          }
          let stock = parseInt(this.productStock)
@@ -645,6 +649,20 @@ export default {
 
          return hasCart != undefined ? stock - parseInt(hasCart.quantity) : stock
 
+      },
+      stockAvailabilityClass() {
+         return {
+            'text-green': this.isCurrentStockUnlimited || this.currentStock >= 5,
+            'text-amber-10': !this.isCurrentStockUnlimited && this.currentStock < 5 && this.currentStock > 0,
+            'text-red': !this.isCurrentStockUnlimited && this.currentStock < 1
+         }
+      },
+      stockAvailabilityText() {
+         if (this.isCurrentStockUnlimited) {
+            return 'Stok Unlimited'
+         }
+
+         return this.currentStock > 0 ? `Tersedia ${this.currentStock} item` : 'Stok Habis'
       },
       currentProductSku() {
          if (this.has_varian && this.product_varian_selected) {
