@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Enums\ProductTypeEnum;
+use App\Models\Config;
+use App\Models\Marketplace;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
@@ -13,19 +17,91 @@ class FrontController extends Controller
 {
    public $shop;
 
-   public function homepage()
+   public function homepage(Request $request)
    {
       $this->shop = getShop();
+      $config = Config::first();
+
+      if (!$this->shop) {
+         $this->shop = new \Illuminate\Support\Fluent([
+            'name' => config('app.name', 'Cepatshop'),
+            'slogan' => null,
+            'description' => null,
+            'logo_path' => null,
+         ]);
+      }
+
       $title = $this->shop->name;
 
       if ($this->shop->slogan) {
          $title = $title . ' | ' . $this->shop->slogan;
       }
-      return View::vue([
-         'title' => $title,
-         'description' => $this->shop->description,
-         'featured_image' => $this->shop->logo_path ? url($this->shop->logo_path) : null,
-      ]);
+
+      $selectedCategory = $request->query('category', 'all');
+      $selectedCategoryId = null;
+
+      if ($selectedCategory && $selectedCategory !== 'all') {
+         $category = Category::select('id', 'slug')
+            ->where('slug', $selectedCategory)
+            ->orWhere('id', $selectedCategory)
+            ->first();
+
+         if ($category) {
+            $selectedCategoryId = $category->id;
+            $selectedCategory = $category->slug ?? (string) $category->id;
+         } else {
+            $selectedCategory = 'all';
+         }
+      }
+
+      $productLimit = intval($config?->home_product_limit ?? 12);
+      if ($productLimit < 6 || $productLimit > 36) {
+         $productLimit = 12;
+      }
+
+      $products = Product::query()
+         ->select('id', 'title', 'slug', 'description', 'price', 'category_id')
+         ->with(['assets:id,filepath', 'category:id,title,slug'])
+         ->where('status', 1)
+         ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues())
+         ->when($selectedCategoryId, function ($query) use ($selectedCategoryId) {
+            $query->where('category_id', $selectedCategoryId);
+         })
+         ->orderByDesc('id')
+         ->paginate($productLimit)
+         ->withQueryString();
+
+      $categories = Category::query()
+         ->select('id', 'title', 'slug')
+         ->whereHas('products', function ($query) {
+            $query->where('status', 1)
+               ->whereIn('product_type', ProductTypeEnum::getNonPhysicalValues());
+         })
+         ->get();
+
+      $quickLinks = Marketplace::query()
+         ->select('id', 'provider', 'icon_path', 'url', 'is_active', 'is_default')
+         ->where('is_active', 1)
+         ->whereNotNull('url')
+         ->where('url', '<>', '')
+         ->orderBy('id')
+         ->get();
+
+      $jsapp = [
+         'page' => [
+            'title' => $title,
+            'description' => $this->shop->description,
+            'featured_image' => $this->shop->logo_path ? url($this->shop->logo_path) : null,
+         ],
+         'shop' => $this->shop,
+         'head' => [
+            'fb_pixel' => $config?->fb_pixel,
+            'gtm' => $config?->gtm,
+            'custom_css' => $config?->custom_css,
+         ],
+      ];
+
+      return view('home', compact('jsapp', 'products', 'categories', 'selectedCategory', 'quickLinks'));
    }
    public function products()
    {
