@@ -68,7 +68,7 @@ module.exports = configure(function (ctx) {
          htmlFilename: ctx.dev ? 'index.html' : 'index.php',
 
          // transpile: false,
-         publicPath: ctx.dev ? '/' : 'auto',
+         publicPath: '/',
 
          // Add dependencies for transpiling with Babel (Array of string/regex)
          // (from node_modules, which are by default not transpiled).
@@ -95,7 +95,7 @@ module.exports = configure(function (ctx) {
                .use(ESLintPlugin, [{ extensions: ['js', 'vue'] }])
 
             if (!ctx.dev) {
-               chain.output.publicPath('auto')
+               chain.output.publicPath('/')
 
                // Optimize chunk splitting for better caching
                chain.optimization.splitChunks({
@@ -159,7 +159,7 @@ module.exports = configure(function (ctx) {
             const bladeBaseTag = '<base href="{{ url(\'/\') }}/">';
             const hasBase = /<base\b/i.test(html);
             if (hasBase) {
-               html = html.replace(/<base\s+href=(["'])?\/auto\/\1\s*>/i, bladeBaseTag);
+               html = html.replace(/<base\b[^>]*>/i, bladeBaseTag);
             } else {
                html = html.replace(/<head(\s[^>]*)?>/i, (match) => `${match}${bladeBaseTag}`);
             }
