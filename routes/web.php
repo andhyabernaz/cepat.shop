@@ -26,6 +26,7 @@ Route::any('/auto/cepat/{any?}', function () {
    abort(404);
 })->where('any', '.*');
 Route::redirect('/auto', '/', 301);
+Route::redirect('/home', '/', 301);
 Route::get('/auto/{any}', function (string $any) {
    return redirect("/{$any}", 301);
 })->where('any', '.*');
