@@ -25,6 +25,17 @@ class DashboardController extends Controller
             }
          );
 
+      if ($request->mode === 'widgets') {
+         $extra = [];
+         if ($request->period === 'weekly') {
+            $extra = $this->weeklyAdminWidgets();
+         }
+
+         return ApiResponse::success(array_merge([
+            'latest_orders' => $latest_orders,
+         ], $extra));
+      }
+
       $order_reports = Cache::remember('order_reports', now()->addMinutes(30), function () {
          return DB::table('orders')->select(
             DB::raw("COUNT(*) as order_total"),
@@ -94,6 +105,57 @@ class DashboardController extends Controller
       ]);
    }
 
+   protected function weeklyAdminWidgets(): array
+   {
+      $start = Carbon::now()->startOfDay()->subDays(6);
+      $end = Carbon::now()->endOfDay();
+
+      $todayOrdersTotal = Cache::remember('today_orders_total', now()->addMinutes(2), function () {
+         return Order::query()->whereDate('created_at', Carbon::today())->count();
+      });
+
+      $performance = Cache::remember('weekly_sales_performance', now()->addMinutes(2), function () use ($start, $end) {
+         $rows = DB::table('orders')
+            ->join('transactions', 'transactions.order_id', 'orders.id')
+            ->where('transactions.status', 'PAID')
+            ->whereBetween('orders.created_at', [$start, $end])
+            ->select(
+               DB::raw('DATE(orders.created_at) as date'),
+               DB::raw("SUM(orders.order_total + orders.payment_fee) as total")
+            )
+            ->groupBy(DB::raw('DATE(orders.created_at)'))
+            ->orderBy('date')
+            ->get();
+
+         $byDate = $rows->mapWithKeys(function ($row) {
+            $date = (string) ($row->date ?? '');
+            $total = (int) ($row->total ?? 0);
+            return [$date => $total];
+         });
+
+         $labels = [];
+         $series = [];
+
+         for ($cursor = $start->copy(); $cursor->lte($end); $cursor->addDay()) {
+            $key = $cursor->format('Y-m-d');
+            $labels[] = $cursor->format('d M');
+            $series[] = (int) ($byDate[$key] ?? 0);
+         }
+
+         $total = array_sum($series);
+
+         return [
+            'weekly_sales_total' => $total,
+            'weekly_sales_labels' => $labels,
+            'weekly_sales_series' => $series,
+         ];
+      });
+
+      return array_merge([
+         'today_orders_total' => (int) $todayOrdersTotal,
+      ], $performance);
+   }
+
    protected function landingStats()
    {
       return [
@@ -156,7 +218,6 @@ class DashboardController extends Controller
    {
 
       $cacheKey = 'transaction_reports' . http_build_query($request->all());
-      Cache::forget($cacheKey);
 
       $transactions = Cache::remember(
          $cacheKey,
@@ -172,6 +233,11 @@ class DashboardController extends Controller
                   switch ($request->period) {
                      case 'today':
                         $q->whereDate('orders.created_at', Carbon::now());
+                        break;
+                     case 'weekly':
+                        $start = Carbon::now()->startOfDay()->subDays(6);
+                        $end = Carbon::now()->endOfDay();
+                        $q->whereBetween('orders.created_at', [$start, $end]);
                         break;
                      case 'monthly':
                         $q->whereMonth('orders.created_at', Carbon::now())->whereYear('orders.created_at', Carbon::now());

@@ -70,6 +70,22 @@ class AdminDashboardLandingDataTest extends TestCase
             ->assertJsonPath('data.landing_stats.3.value', 1);
     }
 
+    public function test_admin_reports_weekly_returns_dashboard_widgets(): void
+    {
+        $admin = User::query()->findOrFail(1);
+        Sanctum::actingAs($admin);
+
+        $response = $this->getJson('/api/adminReports?period=weekly&mode=widgets');
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.today_orders_total', 0)
+            ->assertJsonPath('data.weekly_sales_total', 102000)
+            ->assertJsonCount(7, 'data.weekly_sales_labels')
+            ->assertJsonCount(7, 'data.weekly_sales_series');
+    }
+
     private function createSchema(): void
     {
         Schema::create('users', function (Blueprint $table) {
