@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Config;
 use App\Models\Marketplace;
 use App\Models\Post;
+use App\Models\Page;
 use App\Models\Slider;
 use App\Models\Store;
 use App\Models\Voucher;
@@ -225,6 +226,17 @@ class FrontApiController extends Controller
     public function getPostDetail($slug)
     {
         $data = Post::where('slug', $slug)->with('asset', 'user')->first();
+
+        return ApiResponse::success($data);
+    }
+
+    public function getPageDetail($slug)
+    {
+        $data = Page::query()
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->with('asset')
+            ->first();
 
         return ApiResponse::success($data);
     }

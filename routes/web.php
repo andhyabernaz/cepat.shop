@@ -66,6 +66,7 @@ Route::middleware([Installed::class])->group(
       Route::get('/product/{slug}', [FrontController::class, 'productDetail'])->name('product.show');
       Route::get('/posts', [FrontController::class, 'postIndex']);
       Route::get('/post/{slug}', [FrontController::class, 'postDetail'])->name('post.show');
+      Route::get('/page/{slug}', [FrontController::class, 'pageDetail'])->name('page.show');
       Route::get('/p/invoice/{id}', [FrontController::class, 'showInvoice'])->name('invoice');
       Route::get('/sitemap.xml', [FrontController::class, 'sitemap']);
       Route::get('/clear-cache', [FrontController::class, 'clearCache']);

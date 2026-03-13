@@ -18,6 +18,7 @@ use App\Http\Controllers\SseController;
 Route::get('getInitialData', [FrontApiController::class, 'getInitialData']);
 Route::get('clear-cache', [FrontApiController::class, 'clearCache']);
 Route::get('getPost/{slug}', [FrontApiController::class, 'getPostDetail']);
+Route::get('getPage/{slug}', [FrontApiController::class, 'getPageDetail']);
 Route::get('getPromotePosts', [FrontApiController::class, 'getPromotePosts']);
 Route::get('getCategories', [FrontApiController::class, 'getCategories']);
 Route::get('getPosts', [FrontApiController::class, 'getPosts']);

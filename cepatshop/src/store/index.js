@@ -26,6 +26,7 @@ import product from './product'
 import category from './categories'
 import slider from './slider'
 import post from './post'
+import page from './page'
 import block from './block'
 import order from './order'
 import bank from './bank'
@@ -288,6 +289,15 @@ export default store(function (/* { ssrContext } */) {
                ability: 'view-content'
             },
             {
+               label: "Halaman",
+               caption: "Kelola Halaman / landing page",
+               path: "AdminPageIndex",
+               icon: "description",
+               color: "deep-orange",
+               active: true,
+               ability: 'view-content'
+            },
+            {
                label: "Akun Pembayaran",
                caption: "Kelola Akun Pembayaran",
                path: "BankIndex",
@@ -352,6 +362,7 @@ export default store(function (/* { ssrContext } */) {
          category,
          slider,
          post,
+         page,
          block,
          order,
          bank,

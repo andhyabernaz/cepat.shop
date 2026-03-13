@@ -6,6 +6,7 @@ use App\Enums\ProductTypeEnum;
 use App\Models\Config;
 use App\Models\Marketplace;
 use App\Models\Post;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -170,6 +171,28 @@ class FrontController extends Controller
          'title' => $post->title . ' | ' . $this->shop->name,
          'description' => createTeaser($post->body),
          'featured_image' => $post->asset ? $post->asset->src : ''
+      ]);
+   }
+   public function pageDetail($slug)
+   {
+      $this->shop = getShop();
+      $page = Page::query()
+         ->select('id', 'title', 'slug', 'meta_description', 'content')
+         ->with('asset')
+         ->where('slug', $slug)
+         ->where('status', 'published')
+         ->first();
+
+      if (! $page) {
+         return redirect('/');
+      }
+
+      $desc = $page->meta_description ?: createTeaser($page->content);
+
+      return View::vue([
+         'title' => $page->title . ' | ' . $this->shop->name,
+         'description' => $desc,
+         'featured_image' => $page->asset ? $page->asset->src : ''
       ]);
    }
    public function showInvoice($id)

@@ -22,6 +22,7 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\WagatewayController;
 use App\Http\Controllers\MailConfigController;
 use App\Http\Controllers\PermissionController;
@@ -72,6 +73,7 @@ Route::apiResource('categories', CategoryController::class);
 
 Route::apiResource('posts', PostController::class);
 Route::get('post-tags', [PostController::class, 'postTags']);
+Route::apiResource('pages', PageController::class);
 
 Route::get('update', [UpdateController::class, 'overview']);
 Route::post('update', [UpdateController::class, 'update']);
@@ -158,5 +160,4 @@ Route::apiResource('roles', RoleController::class);
 Route::post('permissions/toggle', [PermissionController::class, 'toggle']);
 Route::get('roles-permissions', [PermissionController::class, 'rolePermissions']);
 Route::get('getUserPermissions', [PermissionController::class, 'getUserPermissions']);
-
 

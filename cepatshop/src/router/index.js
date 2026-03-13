@@ -11,7 +11,7 @@ import routes from './routes'
  * with the Router instance.
  */
 
-export default route(function (/* { store, ssrContext } */) {
+export default route(function ({ store }) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
@@ -33,6 +33,32 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE)
+  })
+
+  Router.beforeEach((to, from, next) => {
+    const token = store?.state?.user?.token
+    const user = store?.state?.user?.user
+
+    const requiresAdmin = to.matched.some((r) => r.meta?.requiresAdmin)
+    const requiresCustomer = to.matched.some((r) => r.meta?.requiresCustomer)
+
+    if (!requiresAdmin && !requiresCustomer) return next()
+
+    if (!token) {
+      return next({ name: 'Login', query: { redirect: to.fullPath } })
+    }
+
+    if (!user) return next()
+
+    if (requiresAdmin && !user.is_admin) {
+      return next({ name: 'Home' })
+    }
+
+    if (requiresCustomer && user.is_admin) {
+      return next({ name: 'AdminDashboard' })
+    }
+
+    return next()
   })
 
   return Router
