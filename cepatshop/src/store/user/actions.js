@@ -3,20 +3,32 @@ import { Notify } from 'quasar'
 
 export function login({ commit, dispatch }, payload) {
    commit('SET_LOADING', true, { root: true })
+   commit('CLEAR_ERRORS', null, { root: true })
 
-   BaseApi.post('auth/login', payload)
+   return BaseApi.post('auth/login', payload)
       .then(response => {
          if (response.status == 200) {
             let data = response.data.data
             commit('SET_USER', data.user)
             commit('SET_TOKEN', data.token)
 
-            if (data.user.is_admin) {
-               this.$router.push({ name: 'AdminDashboard' })
+            if (payload?.redirect) {
+               this.$router.push(payload.redirect)
             } else {
-               this.$router.push({ name: 'CustomerDashboard' })
+               if (data.user.is_admin) {
+                  this.$router.push({ name: 'AdminDashboard' })
+               } else {
+                  this.$router.push({ name: 'CustomerDashboard' })
+               }
             }
          }
+         return response
+      })
+      .catch((error) => {
+         if (error?.response?.status === 422 && error?.response?.data?.errors) {
+            commit('SET_ERRORS', error.response.data.errors, { root: true })
+         }
+         throw error
       })
       .finally(() => {
          commit('SET_LOADING', false, { root: true })
@@ -25,8 +37,9 @@ export function login({ commit, dispatch }, payload) {
 }
 export function register({ commit, dispatch }, payload) {
    commit('SET_LOADING', true, { root: true })
+   commit('CLEAR_ERRORS', null, { root: true })
 
-   BaseApi.post('auth/register', payload)
+   return BaseApi.post('auth/register', payload)
       .then(response => {
          if (response.status == 200) {
             let data = response.data.data
@@ -34,12 +47,23 @@ export function register({ commit, dispatch }, payload) {
             commit('SET_USER', data.user)
             commit('SET_TOKEN', data.token)
 
-            if (data.user.is_admin) {
-               this.$router.push({ name: 'AdminDashboard' })
+            if (payload?.redirect) {
+               this.$router.push(payload.redirect)
             } else {
-               this.$router.push({ name: 'CustomerDashboard' })
+               if (data.user.is_admin) {
+                  this.$router.push({ name: 'AdminDashboard' })
+               } else {
+                  this.$router.push({ name: 'CustomerDashboard' })
+               }
             }
          }
+         return response
+      })
+      .catch((error) => {
+         if (error?.response?.status === 422 && error?.response?.data?.errors) {
+            commit('SET_ERRORS', error.response.data.errors, { root: true })
+         }
+         throw error
       })
       .finally(() => {
          commit('SET_LOADING', false, { root: true })
