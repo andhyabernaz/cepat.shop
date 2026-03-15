@@ -69,12 +69,10 @@
          v-model="leftDrawerOpen"
          side="left"
          bordered
-         :overlay="is_mobile_nav"
-         :behavior="is_mobile_nav ? 'mobile' : 'desktop'"
-         :show-if-above="!is_mobile_nav"
-         :mini="!is_mobile_nav && is_mini"
+         overlay
+         behavior="mobile"
+         :show-if-above="false"
          :width="280"
-         :mini-width="92"
          class="cs-admin-drawer"
       >
          <MainMenu />

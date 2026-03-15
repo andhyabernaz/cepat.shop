@@ -98,15 +98,11 @@ export default {
       state.config.theme = payload
    },
    SET_THEME_COLOR: (state, clr) => {
-      state.config.theme_color = clr
-      document.body.style.setProperty('--q-primary', clr)
-      // // localStorage.setItem('shop_config', JSON.stringify(state.config))
-      AddressbarColor.set(state.theme_color)
-   },
-   SET_THEME_COLOR: (state, clr) => {
-      state.config.theme_color = clr
-      setCssVar('brand', state.config.theme_color)
-      AddressbarColor.set(state.config.theme_color)
+      const color = clr || state.config.theme_color || '#1976D2'
+      state.config.theme_color = color
+      document.body.style.setProperty('--q-primary', color)
+      setCssVar('brand', color)
+      AddressbarColor.set(color)
    },
    SET_PRIMARY_COLOR: (state, clr) => {
       state.config.primary_color = clr

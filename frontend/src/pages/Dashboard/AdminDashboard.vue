@@ -528,15 +528,15 @@ export default {
 }
 
 .admin-dashboard__card--kpi {
-   grid-column: span 6;
+   grid-column: span 3;
 }
 
 .admin-dashboard__card--chart {
-   grid-column: span 7;
+   grid-column: span 6;
 }
 
 .admin-dashboard__card--orders {
-   grid-column: span 5;
+   grid-column: span 6;
 }
 
 .admin-dashboard__orders-head {
@@ -617,7 +617,22 @@ export default {
    color: var(--cs-text-secondary);
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
+   .admin-dashboard__card--kpi {
+      grid-column: span 6;
+   }
+
+   .admin-dashboard__card--chart,
+   .admin-dashboard__card--orders {
+      grid-column: span 12;
+   }
+
+   .admin-dashboard__metric {
+      grid-column: span 6;
+   }
+}
+
+@media (max-width: 768px) {
    .admin-dashboard__card--kpi,
    .admin-dashboard__card--chart,
    .admin-dashboard__card--orders {
