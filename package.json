@@ -1,0 +1,12 @@
+{
+   "private": true,
+   "type": "module",
+   "scripts": {
+      "dev": "npm run serve",
+      "prod": "npm run build",
+      "serve": "npm --prefix frontend run dev",
+      "build": "npm --prefix frontend exec quasar -- build -m pwa",
+      "build-spa": "npm --prefix frontend exec quasar -- build",
+      "start": "npm --prefix frontend install"
+   }
+}

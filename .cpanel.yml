@@ -1,0 +1,5 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=$HOME/public_html/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /usr/bin/find . -maxdepth 1 -mindepth 1 \( -name .git -o -name .cpanel.yml -o -name .env \) -prune -o -exec /bin/cp -R {} $DEPLOYPATH \;
